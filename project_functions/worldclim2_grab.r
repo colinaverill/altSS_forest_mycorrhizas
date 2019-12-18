@@ -20,7 +20,7 @@
 #'                                                                                      2L))
 #' test.out <- worldclim2_grab(points[,2], points[,1])
 worldclim2_grab <- function(latitude, longitude,
-                            worldclim2_folder = '/projectnb/talbot-lab-data/caverill/altSS_forest_mycorrhizas_data/raw_data/WorldClim2/'
+                            worldclim2_folder = '/projectnb/talbot-lab-data/caverill/WorldClim2/'
                             ){
   
   #make points an object
