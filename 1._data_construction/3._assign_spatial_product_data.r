@@ -12,6 +12,10 @@ source('paths.r')
 #Load data.----
 p1 <- data.table(readRDS(Product_1.path))
 p2 <- data.table(readRDS(Product_2.path))
+#drop some NAs.
+p1 <- as.data.frame(p1)
+p1 <- p1[!is.na(p1$PLT_CN),]
+p1 <- data.table(p1)
 
 #remove spatial columns if already present.----
 to.drop <- c('n.dep','wet.dep','dry.dep','mat','map','mat_CV','map_CV','mat_sd','map_sd','mdr')

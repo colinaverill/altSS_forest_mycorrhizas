@@ -3,8 +3,10 @@
 #There are currently warnings. ignore them.
 #User must specify path to directory of Ndep rasters from CASTNET.
 extract_ndep <- function(longitude,latitude,
-                         castnet.dir = '/projectnb/talbot-lab-data/caverill/altSS_forest_mycorrhizas_data/raw_data/CASTNET_Ndep/'
+                         castnet.dir = '/projectnb/talbot-lab-data/caverill/CASTNET_Ndep/'
                          ){
+  host <- system('hostname', intern = T)
+  if(host == 'pecan2'){castnet.dir = '/fs/data3/caverill/CASTNET_Ndep/'}
   #load dry deposition rasters
   dry.list <- list()
   for(i in 0:15){
