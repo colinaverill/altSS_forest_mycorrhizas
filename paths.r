@@ -9,9 +9,11 @@ system(cmd)
 #FIA input paths.----
 FIA7.dir.path <- '/fs/data3/caverill/FIA7/'
 #FIA7.dir.path <- paste0(storage.dir,'raw_data/')
-cmd <- paste0('mkdir -p ',FIA7.dir.path)
-system(cmd)
-FIAdb.path <- paste0(FIA7.dir.path,'FIA7.sqlite')
+if(host == 'pecan2'){
+  cmd <- paste0('mkdir -p ',FIA7.dir.path)
+  system(cmd)
+  FIAdb.path <- paste0(FIA7.dir.path,'FIA7.sqlite')
+}
 
 #FIA filtered output paths.----
 fia.dir <- paste0(storage.dir,'FIA_output/')
