@@ -235,7 +235,9 @@ for(i in 1:length(scaled.list)){
 
 #save output.----
 #Product_1 is a plot-level forest data for most recent sampling.
-Product_1      <- scaled.list[[2]]
+Product_1 <- scaled.list[[2]]
+Product_1 <- as.data.frame(Product_1)
+Product_1 <- Product_1[!is.na(Product_1$PLT_CN),]
 saveRDS(Product_1, file=Product_1.path, version = 2)
 
 

@@ -12,10 +12,6 @@ source('paths.r')
 #Load data.----
 p1 <- data.table(readRDS(Product_1.path))
 p2 <- data.table(readRDS(Product_2.path))
-#drop some NAs.
-p1 <- as.data.frame(p1)
-p1 <- p1[!is.na(p1$PLT_CN),]
-p1 <- data.table(p1)
 
 #remove spatial columns if already present.----
 to.drop <- c('n.dep','wet.dep','dry.dep','mat','map','mat_CV','map_CV','mat_sd','map_sd','mdr')
@@ -25,12 +21,12 @@ p2 <- p2[,c(to.drop) := NULL]
 #pull N deposition data. ignore warnings.-----
 p1 <- cbind(p1,extract_ndep(p1$longitude, p1$latitude))
 setnames(p1, 'n.dep','ndep')
-p2 <- merge(p2,p1[,.(PLT_CN,ndep,dry.dep,wet.dep)])
+p2 <- merge(p2,p1[,c('PLT_CN','ndep','dry.dep','wet.dep')])
 
 #pull worldclim2 climate data.----
 p1 <- cbind(p1,worldclim2_grab(p1$latitude,p1$longitude))
-p2 <- merge(p2, p1[,.(PLT_CN,mat,map,mat_CV,map_CV,mdr)])
+p2 <- merge(p2, p1[,c('PLT_CN','mat','map','mat_CV','map_CV','mdr')])
 
 #save output.----
-saveRDS(p1, Product_1.path)
-saveRDS(p2, Product_2.path)
+saveRDS(p1, Product_1.path, version = 2)
+saveRDS(p2, Product_2.path, version = 2)
