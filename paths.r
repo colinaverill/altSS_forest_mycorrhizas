@@ -32,11 +32,16 @@ Product_2.subset.path  <- paste0(fia.dir,"Product_2.subset.rds")
 time_series_dat.path   <- paste0(fia.dir,'time_series_dat.rds')
 
 #GAM and simulation model output paths.----
-demographic_fits.path <- paste0(storage.dir,'demographic_fits.rds')
-#myco_gam_fits2.path <- paste0(storage.dir,'myco_gam_fits2.rds')
+model.dir <- paste0(storage.dir,'model_output/')
+cmd <- paste0('mkdir -p ',model.dir)
+system(cmd)
+
+#GAM fits.
+demographic_fits.path <- paste0(model.dir,'demographic_fits.rds')
+#myco_gam_fits2.path <- paste0(model.dir,'myco_gam_fits2.rds')
  
 #simulation output paths.
-null_vs_feedback_simulation_output.path          <- paste0(storage.dir,'null_vs_feedback_simulation_output.rds')
-factorial_hysteresis_simulation.path             <- paste0(storage.dir,'factorial_hysteresis_simulation.rds')
-factorial_hysteresis_simulation_disturbance.path <- paste0(storage.dir,'factorial_hysteresis_simulation_disturbance.rds')
-factorial_hysteresis_simulation_uniform.path     <- paste0(storage.dir,'factorial_hysteresis_simulation_uniform.path')
+null_vs_feedback_simulation_output.path          <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
+factorial_hysteresis_simulation.path             <- paste0(model.dir,'factorial_hysteresis_simulation.rds')
+factorial_hysteresis_simulation_disturbance.path <- paste0(model.dir,'factorial_hysteresis_simulation_disturbance.rds')
+factorial_hysteresis_simulation_uniform.path     <- paste0(model.dir,'factorial_hysteresis_simulation_uniform.path')
