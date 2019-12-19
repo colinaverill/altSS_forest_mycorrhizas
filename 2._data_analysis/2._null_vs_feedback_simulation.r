@@ -20,13 +20,13 @@ output.path <- null_vs_feedback_simulation_output.path
 set.seed(42)
 
 #load models and environmental covariates.----
-fits <- readRDS(myco_gam_fits2.path) #trying with new density dependence for recruitment.
+fits <- readRDS(demographic_fits.path) #trying with new density dependence for recruitment.
 env.cov <- data.frame(t(fits$env.cov))
 env.cov <- fits$all.cov
 N.PLOTS <- 1000 #Must be even!
 
 #register parallel environment.----
-n.cores <- detectCores()
+n.cores <- detectCores() - 1 #minus 1 so your computer keeps running.
 
 #Run drawwing from distribution of plot level environmental conditions.----
 #Null model.
@@ -66,9 +66,18 @@ saveRDS(out, output.path, version = 2)
 #visualize.----
 visualize = F
 if(visualize == T){
-  par(mfrow = c(1,2))
-  a <- out$n.feedback$plot.table$relEM
-  b <- out$y.feedback$plot.table$relEM
-  hist(a, xlim = c(0,1))
-  hist(b, xlim = c(0,1))
+  par(mfrow = c(4,2))
+  a <- out$n.feedback$plot.table
+  b <- out$y.feedback$plot.table
+  hist(a$relEM, xlim = c(0,1))
+  hist(b$relEM, xlim = c(0,1))
+  #basal area.
+  hist(a$BASAL.plot)
+  hist(b$BASAL.plot)
+  #stem density.
+  hist(a$stem.density)
+  hist(b$stem.density)
+  #self thinning. Not sure if I am plotting this correctly.
+  plot(log(a$BASAL.plot/a$stem.density) ~ log(a$stem.density), bty = 'l')
+  plot(log(b$BASAL.plot/b$stem.density) ~ log(b$stem.density), bty = 'l')
 }
