@@ -12,12 +12,20 @@ output.path <- Product_2.subset.path
 p2 <- readRDS(Product_2.path)
 states <- read.csv('required_products_utilities/FIA_state_codes_regions.csv')
 
+#Some final data cleaning (should be moved?).-----
+#Would be nice to move these to full data filtering script (#2).
+p2 <- p2[p2$REMPER >=4.9 & p2$REMPER <= 5.1,]
+p2 <- p2[p2$n.trees >  5,]
+#Complete cases of environmental covariates.
+env.drop <- p2[,c('PLT_CN','ndep','mat','map')]
+env.drop <- env.drop[!complete.cases(env.drop),]
+env.drop <- unique(env.drop$PLT_CN)
+p2 <- p2[!(p2$PLT_CN %in% env.drop),]
+
 #Grab a plot table with PLT_CN, lat-lon and STATECD.----
 d <- p2[,.(PLT_CN,LAT,LON,STATECD,relEM,REMPER)]
 setkey(d, 'PLT_CN')
 d <- unique(d)
-d <- d[d$REMPER >=4.9 & d$REMPER <= 5.1,]
-
 
 #Subset.----
 set.seed(42069)
