@@ -12,10 +12,6 @@ d1 <- data.table(readRDS(Product_1.path))
 d2 <- data.table(readRDS(Product_2.subset.path))
 
 #Subset and rename some things.-----
-#Can probably move this to data filtering script.
-d2 <- d2[n.trees >  5,]
-#Subset to a tight ~5-year remeasurement period (REMPER) window.
-d2 <- d2[d2$REMPER >=4.9 & d2$REMPER <= 5.1,]
 d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
 setnames(d1,'plot.BASAL','BASAL.plot')
 setnames(d2,'plot.BASAL','BASAL.plot')
@@ -47,4 +43,4 @@ all.cov <- d1[,c('mat','map','ndep')]
 #Save models and size categories.----
 output <- list(n.feedback, y.feedback, cov, all.cov)
 names(output) <- c('n.feedback', 'y.feedback','env.cov','all.cov')
-saveRDS(output, output.path)
+saveRDS(output, output.path, version = 2)
