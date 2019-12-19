@@ -20,7 +20,7 @@ output.path <- null_vs_feedback_simulation_output.path
 set.seed(42)
 
 #load models and environmental covariates.----
-fits <- readRDS(demographic_fits.path) #trying with new density dependence for recruitment.
+fits <- readRDS(demographic_fits.path)
 env.cov <- data.frame(t(fits$env.cov))
 env.cov <- fits$all.cov
 N.PLOTS <- 1000 #Must be even!
