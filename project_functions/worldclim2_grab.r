@@ -22,28 +22,32 @@
 worldclim2_grab <- function(latitude, longitude,
                             worldclim2_folder = '/projectnb/talbot-lab-data/caverill/WorldClim2/'
                             ){
-  
+  host <- system('hostname', intern = T)
+  if(host == 'Colins-MacBook-Pro-2.local'){worldclim2_folder <- '/Users/colin/data_storage/WorldClim2/'}
+  if(host == 'Colins-MBP-2')              {worldclim2_folder <- '/Users/colin/data_storage/WorldClim2/'}
   #make points an object
   points <- cbind(longitude, latitude)
  
   #load mean annual temperature and precipitation rasters from worldclim2
   prec    <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_12.tif'))
   temp    <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_01.tif'))
-  temp_CV <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_04.tif'))
-  prec_CV <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_15.tif'))
-  mdr     <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_02.tif'))
+  #temp_CV <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_04.tif'))
+  #prec_CV <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_15.tif'))
+  #mdr     <- raster::raster(paste0(worldclim2_folder,'wc2.0_bio_30s_02.tif'))
   
   
   #extract worldclim2 predicted climate data.
      prec.obs <- raster::extract(prec   , points)
      temp.obs <- raster::extract(temp   , points)
-  prec_CV.obs <- raster::extract(prec_CV, points)
-  temp_CV.obs <- raster::extract(temp_CV, points)
-      mdr.obs <- raster::extract(    mdr, points)
+  #prec_CV.obs <- raster::extract(prec_CV, points)
+  #temp_CV.obs <- raster::extract(temp_CV, points)
+  #    mdr.obs <- raster::extract(    mdr, points)
   
   #wrap output to return.
-  to_return <- data.frame(cbind(prec.obs,temp.obs,prec_CV.obs,temp_CV.obs,mdr.obs))
-  colnames(to_return) <- c('map','mat','map_CV','mat_CV','mdr')
+  to_return <- data.frame(cbind(prec.obs,temp.obs))
+  colnames(to_return) <- c('map','mat')
+  #to_return <- data.frame(cbind(prec.obs,temp.obs,prec_CV.obs,temp_CV.obs,mdr.obs))
+  #colnames(to_return) <- c('map','mat','map_CV','mat_CV','mdr')
       
   #return output.
   return(to_return)

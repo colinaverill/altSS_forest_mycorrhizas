@@ -7,6 +7,8 @@ extract_ndep <- function(longitude,latitude,
                          ){
   host <- system('hostname', intern = T)
   if(host == 'pecan2'){castnet.dir = '/fs/data3/caverill/CASTNET_Ndep/'}
+  if(host == 'Colins-MacBook-Pro-2.local'){castnet.dir <- '/Users/colin/data_storage/CASTNET_Ndep/'}
+  if(host == 'Colins-MBP-2')              {castnet.dir <- '/Users/colin/data_storage/CASTNET_Ndep/'}
   #load dry deposition rasters
   dry.list <- list()
   for(i in 0:15){
