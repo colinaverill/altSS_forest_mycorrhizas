@@ -1,8 +1,9 @@
 #AM to EM hysteresis conceptual figure
 rm(list=ls())
+source('paths.r')
 
 #set output path.----
-output.path <- 'conceptual_hysteresis.png'
+output.path <- Fig_1.path
 
 #generate data.-----
 x  <- seq(0,15,length.out=100)

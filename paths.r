@@ -47,3 +47,13 @@ null_vs_feedback_simulation_output.path          <- paste0(model.dir,'null_vs_fe
 factorial_hysteresis_simulation.path             <- paste0(model.dir,'factorial_hysteresis_simulation.rds')
 factorial_hysteresis_simulation_disturbance.path <- paste0(model.dir,'factorial_hysteresis_simulation_disturbance.rds')
 factorial_hysteresis_simulation_uniform.path     <- paste0(model.dir,'factorial_hysteresis_simulation_uniform.path')
+
+#Figure output paths.----
+fig.dir <- 'figures/'
+cmd <- paste0('mkdir -p ',fig.dir)
+system(cmd)
+Fig_1.path <- paste0(fig.dir,'Fig._1._conceptual_hysteresis.png')
+Fig_2.path <- paste0(fig.dir,'Fig._2._disribution_and_bimodality.png')
+
+
+
