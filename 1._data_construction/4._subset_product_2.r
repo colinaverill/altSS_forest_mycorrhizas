@@ -11,6 +11,7 @@ output.path <- Product_2.subset.path
 #load data.----
 p2 <- readRDS(Product_2.path)
 states <- read.csv('required_products_utilities/FIA_state_codes_regions.csv')
+states.east <- states[states$east_plus == 1,]
 
 #Some final data cleaning (should be moved?).-----
 #Would be nice to move these to full data filtering script (#2).
@@ -28,6 +29,8 @@ setkey(d, 'PLT_CN')
 d <- unique(d)
 
 #Subset.----
+#subset to eastern US.
+d <- d[d$STATECD %in% states.east$STATECD,]
 set.seed(42069)
 n.plots <- 4000 #set number of plots to subsample.
 d <- d[sample(nrow(d), n.plots),]
@@ -41,7 +44,7 @@ if(plot == T){
   world <- map_data('usa')
   map <- ggplot() + geom_cartogram(data = world, map = world, 
                                    aes(x=long, y = lat, group = group, map_id=region))
-  map <- map + coord_proj("+proj=wintri", ylim = c(20,50))
+  map <- map + coord_proj("+proj=wintri", ylim = c(25,50), xlim = c(-96,-69))
   map <- map + geom_point(aes(x = lon, y = lat), color = "yellow"    , size = .2)
   map <- map + theme(axis.line=element_blank(),
                      axis.text.x=element_blank(),
