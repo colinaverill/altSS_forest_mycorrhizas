@@ -20,16 +20,16 @@ setnames(d2,'plot.BASAL','BASAL.plot')
 #Environmental models without feedbacks.
 G.mod    <- gam(DIA.cm     ~ em + em*ndep      + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm       ) + s(BASAL.plot) + s(stem.density), data = d2[DIA.cm > 0,])
 M.mod    <- gam(mortality  ~ em + em*ndep      + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm, k = 5) + s(BASAL.plot) + s(stem.density), data = d2, family = 'binomial')
-R.mod.am <- gam(recruit.am ~ am.density + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot) + s(stem.density), data = d1, family = 'poisson')
-R.mod.em <- gam(recruit.em ~ em.density + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot) + s(stem.density), data = d1, family = 'poisson')
+R.mod.am <- gam(recruit.am ~ am.density + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot, k = 3) + s(stem.density, k = 3), data = d1, family = 'poisson')
+R.mod.em <- gam(recruit.em ~ em.density + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot, k = 3) + s(stem.density, k = 3), data = d1, family = 'poisson')
 n.feedback <- list(G.mod, M.mod, R.mod.am, R.mod.em)
 names(n.feedback) <- c('G.mod','M.mod','R.mod.am','R.mod.em')
 
 #Environmental models with feedbacks.
-G.mod    <- gam(DIA.cm     ~ em*relEM + em*ndep      + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm       ) + s(BASAL.plot) + s(stem.density), data = d2[DIA.cm > 0,])
-M.mod    <- gam(mortality  ~ em*relEM + em*ndep      + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm, k = 5) + s(BASAL.plot) + s(stem.density), data = d2, family = 'binomial')
-R.mod.am <- gam(recruit.am ~ am.density*relEM + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot) + s(stem.density), data = d1, family = 'poisson')
-R.mod.em <- gam(recruit.em ~ em.density*relEM + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot) + s(stem.density), data = d1, family = 'poisson')
+G.mod    <- gam(DIA.cm     ~ em*relEM + em*ndep        + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm       ) + s(BASAL.plot) + s(stem.density), data = d2[DIA.cm > 0,])
+M.mod    <- gam(mortality  ~ em*relEM + em*ndep        + s(mat, k = 3) + s(map, k = 3) + s(PREVDIA.cm, k = 5) + s(BASAL.plot) + s(stem.density), data = d2, family = 'binomial')
+R.mod.am <- gam(recruit.am ~ am.density + relEM + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot, k = 3) + s(stem.density, k = 3), data = d1, family = 'poisson')
+R.mod.em <- gam(recruit.em ~ em.density + relEM + ndep + s(mat, k = 3) + s(map, k = 3)                        + s(BASAL.plot, k = 3) + s(stem.density, k = 3), data = d1, family = 'poisson')
 y.feedback <- list(G.mod, M.mod, R.mod.am, R.mod.em)
 names(y.feedback) <- c('G.mod','M.mod','R.mod.am','R.mod.em')
 
