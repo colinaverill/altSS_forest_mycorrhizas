@@ -54,6 +54,6 @@ cmd <- paste0('mkdir -p ',fig.dir)
 system(cmd)
 Fig_1.path <- paste0(fig.dir,'Fig._1._conceptual_hysteresis.png')
 Fig_2.path <- paste0(fig.dir,'Fig._2._disribution_and_bimodality.png')
-
+Fig_3.path <- paste0(fig.dir,'Fig._3._recruitment_mortality_feedbacks.png')
 
 
