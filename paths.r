@@ -4,6 +4,7 @@ host <- system('hostname', intern = T)
 storage.dir <- '/projectnb/talbot-lab-data/caverill/altSS_forest_mycorrhizas_data/'
 if(host == 'pecan2')                    {storage.dir <- '/fs/data3/caverill/altSS_forest_mycorrhizas_data/'}
 if(host == 'Colins-MacBook-Pro-2.local'){storage.dir <- '/Users/colin/data_storage/altSS_forest_mycorrhizas_data/'}
+if(host == 'Colins-MBP-2')              {storage.dir <- '/Users/colin/data_storage/altSS_forest_mycorrhizas_data/'}
 cmd <- paste0('mkdir -p ',storage.dir)
 system(cmd)
 
