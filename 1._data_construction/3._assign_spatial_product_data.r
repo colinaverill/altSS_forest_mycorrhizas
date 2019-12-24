@@ -25,7 +25,7 @@ p2 <- merge(p2,p1[,c('PLT_CN','ndep','dry.dep','wet.dep')])
 
 #pull worldclim2 climate data.----
 p1 <- cbind(p1,worldclim2_grab(p1$latitude,p1$longitude))
-p2 <- merge(p2, p1[,c('PLT_CN','mat','map','mat_CV','map_CV','mdr')])
+p2 <- merge(p2, p1[,c('PLT_CN','mat','map')])
 
 #save output.----
 saveRDS(p1, Product_1.path, version = 2)

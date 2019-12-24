@@ -89,7 +89,7 @@ for(i in 1:length(data.list)){
 for(i in 1:length(data.list)){
   data.list[[i]] <- data.list[[i]][!(is.na(PREV_PLT_CN)),]
   data.list[[i]] <- data.list[[i]][!(REMPER == 0),]
-  data.list[[i]] <- data.list[[i]][!(STDAGE == 0),]
+  #data.list[[i]] <- data.list[[i]][!(STDAGE == 0),] #These may have a stand age of zero, but thats clearly wrong since they have a REMPER value.
 }
 #Calculate number of species in each plot.----
 for(i in 1:length(data.list)){
@@ -98,7 +98,7 @@ for(i in 1:length(data.list)){
 #Assign recruitment and ectomycorrhizal status at the individual level.----
 for(i in 1:length(data.list)){
   data.list[[i]]$em         <- ifelse(data.list[[i]]$MYCO_ASSO == 'ECM', 1, 0)
-  data.list[[i]]$recruit   <- ifelse(is.na(data.list[[i]]$PREV_TRE_CN), 1, 0)
+  data.list[[i]]$recruit    <- ifelse(is.na(data.list[[i]]$PREV_TRE_CN), 1, 0)
   data.list[[i]]$recruit.em <- data.list[[i]]$recruit * data.list[[i]]$em
   data.list[[i]]$recruit.am <- data.list[[i]]$recruit * abs(data.list[[i]]$em - 1)
   
@@ -114,7 +114,6 @@ for(i in 1:length(data.list)){
 #flag whether a tree died or not, for any reason. If it did, there will be a value associated with "AGENTCD" greater than 0.
 for( i in 1:length(data.list)){
   data.list[[i]]$mortality <- ifelse(data.list[[i]]$AGENTCD > 0, 1, 0)
-  #data.list[[i]][,mortality := ifelse(AGENTCD > 0, 1,  0)]
 }
 
 #Trees that are new (cross 5in threshold) during the remeasurement period don't count as surviving the measurement period. give them NA values.
@@ -200,6 +199,7 @@ for(i in 1:length(scaled.list)){
 
 #Get plot level recruitment and stem density, broken out by AM and EM.----
 for(i in 1:length(scaled.list)){
+  #Pay special attention to cases where all trees in plot are new recruits.
   #recruitment.
   scaled.list[[i]]$recruit    <- aggregate(recruit    ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
   scaled.list[[i]]$recruit.am <- aggregate(recruit.am ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
@@ -209,7 +209,6 @@ for(i in 1:length(scaled.list)){
   scaled.list[[i]]$  em.density <- aggregate(stem.live.am ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
   scaled.list[[i]]$  am.density <- aggregate(stem.live.em ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
 }
-
 
 #pop in relevant data from plot table by taking medians.----
 for(i in 1:length(scaled.list)){
@@ -231,7 +230,10 @@ for(i in 1:length(scaled.list)){
 for(i in 1:length(scaled.list)){
   scaled.list[[i]] <- scaled.list[[i]][!(scaled.list[[i]]$relEM.AM < 0.9),]
 }
-
+#remove sites where initial stem density is 0.----
+for(i in 1:length(scaled.list)){
+  scaled.list[[i]] <- scaled.list[[i]][scaled.list[[i]]$stem.density > 0,]
+}
 
 #save output.----
 #Product_1 is a plot-level forest data for most recent sampling.
@@ -256,60 +258,23 @@ cat('Plot level Product 1 and time series plot level data sets constructed.\n')
 cat('Building individual level product 2...\n')
 
 #Growth and Mortality is modeled at the individual tree level. Take most recent data.
-#This used to loop through multiple dataframes, hence the list. Could drop in past time points if you like, get temporal variation in growth and mortality.
-mort.list <- list(data.list[[2]])
+Product_2 <- data.list[[2]]
+scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
+Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,stem.density,em.density,am.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
 
-#For each tree, cacluate the density of con vs. hetersopecific species and mycorrhizal types within the plot.----
-#2 processors does this in ~1.1 minutes for the first data set of ~23k rows.
-#estimated ~25.85 minutes for full data set (the two most recent samplings).
-#or ~1.4 minutes using 36 processors.
-#for(i in 1:length(mort.list)){
-#  dat <- mort.list[[i]]         #grab a data product out of the list.
-#  plots <- unique(dat$PLT_CN)   #grab the unique sites within the prdocut.
-#  #grab a specific plot - plots within dataset processed in parallel.
-#  tic()
-#  dat.return <- 
-#    foreach(j = 1:length(plots)) %dopar% {
-#      plot <- dat[dat$PLT_CN == plots[j],]
-#      #go through every tree within that plot, calculating conspecific/heterospecific density or basal area.
-#      plot.return <- list()
-#      for(k in 1:nrow(plot)){
-#        spp <- plot[k,]$SPCD
-#        myc <- plot[k,]$MYCO_ASSO
-#        conspec.dens <- nrow(plot[AGENTCD == 0 & plot$SPCD      == spp,])
-#        hetspec.dens <- nrow(plot[AGENTCD == 0 & plot$SPCD      != spp,])
-#        conmyco.dens <- nrow(plot[AGENTCD == 0 & plot$MYCO_ASSO == myc,])
-#        hetmyco.dens <- nrow(plot[AGENTCD == 0 & plot$MYCO_ASSO != myc,])
-#        conspec.basal <- sum(plot[AGENTCD == 0 & plot$SPCD      == spp,]$BASAL, na.rm = T)
-#        hetspec.basal <- sum(plot[AGENTCD == 0 & plot$SPCD      != spp,]$BASAL, na.rm = T)
-#        conmyco.basal <- sum(plot[AGENTCD == 0 & plot$MYCO_ASSO == myc,]$BASAL, na.rm = T)
-#        hetmyco.basal <- sum(plot[AGENTCD == 0 & plot$MYCO_ASSO != myc,]$BASAL, na.rm = T)
-#        plot.results <- c(conspec.dens,hetspec.dens,conmyco.dens,hetmyco.dens,
-#                          conspec.basal,hetspec.basal,conmyco.basal,hetmyco.basal)
-#        plot.return[[k]] <- plot.results
-#      }
-#      plot.return <- do.call(rbind, plot.return)
-#      return(plot.return)
-#    }
-#  toc()
-#  dat.return <- do.call(rbind, dat.return)
-#  colnames(dat.return) <- c('conspec.dens', 'hetspec.dens', 'conmyco.dens', 'hetmyco.dens',
-#                            'conspec.basal','hetspec.basal','conmyco.basal','hetmyco.basal')
-#  dat <- cbind(dat, dat.return)
-#  mort.list[[i]] <- dat
-#}
+#This used to loop through multiple dataframes, hence the list. Could drop in past time points if you like, get temporal variation in growth and mortality.
+#mort.list <- list(data.list[[2]])
 
 #Need to use previous PLT_CN values. Must also merge in relative abundance EM for downstream filtering.----
 #This happens because there used to be more data sets in the list.
-Product_2      <- mort.list[[1]]
+#Product_2      <- mort.list[[1]]
 
 #This will remove sites that didn't make it through Product_1 filtering, which is great.
-scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
-Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,stem.density,em.density,am.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
+#scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
+#Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,stem.density,em.density,am.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
 
 #save Product 2 output.----
 saveRDS(Product_2, Product_2.path, version = 2)
 cat('Finished constructing individual level Product 2.\n')
 
 #end script.
-

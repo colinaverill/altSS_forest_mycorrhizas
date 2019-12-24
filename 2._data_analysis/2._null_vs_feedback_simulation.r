@@ -13,11 +13,7 @@ library(data.table)
 output.path <- null_vs_feedback_simulation_output.path
 
 #RNG seed for reproducibility.----
-#7 - close - even AM bars.
-#42069 - no.
-#42 - just slightly higher on AM extreme. best so far.
-#1- next test.
-set.seed(42)
+set.seed(42069) #looks good!
 
 #load models and environmental covariates.----
 fits <- readRDS(demographic_fits.path) #trying with new density dependence for recruitment.
@@ -64,17 +60,17 @@ names(out) <- c('n.feedback','y.feedback')
 saveRDS(out, output.path, version = 2)
 
 #visualize.----
-visualize = F
+visualize = T
 if(visualize == T){
   par(mfrow = c(4,2))
   a <- out$n.feedback$plot.table
   b <- out$y.feedback$plot.table
-  hist(a$relEM, xlim = c(0,1))
-  hist(b$relEM, xlim = c(0,1))
-  #basal area.
+  hist(a$relEM, xlim = c(0,1), main = 'null model')
+  hist(b$relEM, xlim = c(0,1), main = 'feedback model')
+  #basal area goes too high for deedback, likely driven by the ridiculous stem densities.
   hist(a$BASAL.plot)
   hist(b$BASAL.plot)
-  #stem density.
+  #stem density - stem density goes too high for feedback. 
   hist(a$stem.density)
   hist(b$stem.density)
   #self thinning. Not sure if I am plotting this correctly.
