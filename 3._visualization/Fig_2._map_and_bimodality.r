@@ -1,37 +1,24 @@
 rm(list=ls())
 source('paths.r')
-library(usmap)
 library(ggplot2)
 library(ggpubr)
 library(data.table)
+library(betareg)
 source('project_functions/crib_fun.r')
 
 #set output path.----
 output.path <- Fig_2.path
   
 #load data.----
-#plots.
-d <- readRDS(Product_2.subset.path)
-d <- d[,.(PLT_CN,LAT,LON,STATECD,relEM)]
-setkey(d,'PLT_CN')
-d <- unique(d)
-#states.
-states <- read.csv('required_products_utilities/FIA_state_codes_regions.csv')
-states.east <- states[states$east_plus == 1,]$state_name
-states.east <- as.character(states.east)
-
-#generate histogram data.----
 d2 <- readRDS(Product_2.subset.path)
 d  <- readRDS(Product_1.path)
 d  <- d[d$PLT_CN %in% d2$PLT_CN,]
-#Subset to site level.
-setkey(d,'PLT_CN')
-d <- d[complete.cases(d),]
 
+#generate histogram data.----
 #fit a model.
 #get predictor and y data.
 d$relEM <- crib_fun(d$relEM)
-mod <- betareg::betareg(relEM ~ mat + map + ndep, data = d)
+mod <- betareg(relEM ~ mat + map + ndep, data = d)
 
 #Detrend data.
 #predicted values
