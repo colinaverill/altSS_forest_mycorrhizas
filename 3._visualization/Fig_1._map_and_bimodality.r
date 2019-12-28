@@ -2,12 +2,14 @@ rm(list=ls())
 source('paths.r')
 library(ggplot2)
 library(ggpubr)
+library(ggalt)
 library(data.table)
 library(betareg)
+library(boot)
 source('project_functions/crib_fun.r')
 
 #set output path.----
-output.path <- Fig_2.path
+output.path <- Fig_1.path
   
 #load data.----
 d2 <- readRDS(Product_2.subset.path)
@@ -55,8 +57,6 @@ map <- map + theme(axis.line=element_blank(),
                    panel.grid.minor = element_blank(),
                    panel.background = element_blank()
                    )
-#Legend? Not working.
-#map <- map + scale_colour_gradient2('%EM',low='green', mid = 'pink', high='purple', midpoint = 0.5)
 
 #Generate histogram plot.----
 #get colors for histogram plot.
