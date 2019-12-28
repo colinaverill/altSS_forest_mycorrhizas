@@ -4,7 +4,8 @@ source('paths.r')
 library(mgcv)
 
 #set output path.----
-output.path <- Fig_3.path
+output.path <- Fig_2.path
+
 #setup 2-panel and save line.----
 png(output.path, width = 8, height = 4, units = 'in', res = 300)
 #Setup 2-panel 
@@ -47,9 +48,10 @@ x4 <- rnorm(N,x.pos[4],jit)
 x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
-#plot mortality effects.
+#plot mortality effects.----
 #par(mar = c(4,5,1,1))
-cols <- c('#00acd9','#cfe83c')
+#cols <- c('#00acd9','#cfe83c')
+cols <- c('green','purple')
 col.1 <- c(rep(cols[1],N),rep(cols[2],N))
 limx <- c(min(c(x.am,x.em)), max(c(x.am,x.em)))
 limy <- c(0, max(c(y.am,y.em)))
@@ -65,7 +67,7 @@ legend('bottomleft',legend = c('ectomycorrhizal','arbuscular mycorrhizal'),
        horiz = F)
 mtext('AM Forest',side = 1, line = 1, adj = 0.125, cex = 1)
 mtext('EM Forest',side = 1, line = 1, adj = 0.9, cex = 1)
-mtext('A.', side = 1, line = -1.75, adj = 0.95, cex = 1.0)
+mtext('A', side = 1, line = -1.75, adj = 0.95, cex = 1.0, font = 2)
 
 #load, workup and plot positive recruitment feedbacks.----
 #Load fits and data.
@@ -104,9 +106,10 @@ x4 <- rnorm(N,x.pos[4],jit)
 x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
-#plot recruitment effects.
+#plot recruitment effects.----
 #par(mar = c(4,5,1,1))
-cols <- c('#00acd9','#cfe83c')
+#cols <- c('#00acd9','#cfe83c')
+cols <- c('green','purple')
 col.1 <- c(rep(cols[1],N),rep(cols[2],N))
 labx <- c('AM in EM Forest','AM in AM Forest','EM in AM Forest','EM in EM Forest')
 limx <- c(min(c(x.am,x.em)), max(c(x.am,x.em)))
@@ -120,7 +123,7 @@ lab <- expression(paste('Recruitment - Poisson ',lambda))
 mtext(lab, side = 2, cex = 1.0, line = 2.5)
 mtext('AM Forest',side = 1, line = 1, adj = 0.125, cex = 1)
 mtext('EM Forest',side = 1, line = 1, adj = 0.9, cex = 1)
-mtext('B.', side = 1, line = -1.75, adj = 0.95, cex = 1.0)
+mtext('B', side = 1, line = -1.75, adj = 0.95, cex = 1.0, font = 2)
 
 #end plots.----
 dev.off()
