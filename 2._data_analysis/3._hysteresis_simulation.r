@@ -10,7 +10,7 @@ library(data.table)
 
 
 #set output path.----
-output.path <- factorial_hysteresis_simulation_disturbance.path
+output.path <- factorial_hysteresis_simulation.path
 
 #load models and environmental covariates.----
 fits <- readRDS(demographic_fits.path) #trying with new density dependence for recruitment.

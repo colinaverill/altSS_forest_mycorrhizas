@@ -1,2 +1,2 @@
 #transferring pecan_gen on pecan to scc.
-scp -r /fs/data3/caverill/altSS_forest_mycorrhizas_data/model_output/. caverill@scc1.bu.edu:/projectnb/talbot-lab-data/caverill/altSS_forest_mycorrhizas_data/model_output/
+scp -r /Users/colin/data_storage/altSS_forest_mycorrhizas_data/model_output/. caverill@scc1.bu.edu:/projectnb/talbot-lab-data/caverill/altSS_forest_mycorrhizas_data/model_output/
