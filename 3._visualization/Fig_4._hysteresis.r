@@ -11,10 +11,11 @@ y1 <- (-1/ (1+ exp(-(x-10.0))))+1
 y2 <- (-1/ (1+ exp(-(x- 5.0))))+1
 y3 <- (-1/ (1+ exp(-(x- 7.5))))+1
 
-#setup plot save destination.----
+#setup plot save destination, general figure parameters.----
 png(filename=output.path, width=10, height=4, units='in', res=300)
+#Set number of panels, overall margins.
 par(mfrow=c(1,3), oma=c(5.5,5,2,1), mar=c(0,0,0,0))
-#set bertical adjustment to add room for titles
+#set vertical adjustment to add room for titles.
 adjust <- 1.07
 
 #Panel 1. null hypothesis.----
@@ -121,7 +122,7 @@ down$n    <- down$n    / n.tot
 down$lo95 <- down$lo95 / n.tot
 down$hi95 <- down$hi95 / n.tot
 
-#Plot hysteresis simulation ramp up and ramp down.----
+#Panel 3.  hysteresis simulation ramp up / ramp down.----
 par(mar = c(0,3,0,0))
 cols <- c('purple','light pink')
 trans <- 0.3
@@ -147,7 +148,7 @@ arrows(x0 = 7, y0 = 0.08, x1 = 3, y1 = 0.16, length = 0.1, lwd = 1.5)
 mtext('Demographic Simulation', side = 3, adj = 0.05, line = -1.5)
 mtext('Nitrogen Deposition', side = 1, line = 2.5)
 mtext('C', side = 1, line = -1.5, adj = 0.05, font = 2)
-mtext(expression(paste("kg N ha"^"-1","yr"^"-1",sep="")), side = 1, line = 4.5,  cex = 0.8)
+mtext(expression(paste("kg N ha"^"-1"," yr"^"-1",sep="")), side = 1, line = 4.5,  cex = 0.8)
 
 
 #end plot.----
