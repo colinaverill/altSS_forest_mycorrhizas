@@ -48,8 +48,8 @@ null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_si
 fig.dir <- 'figures/'
 cmd <- paste0('mkdir -p ',fig.dir)
 system(cmd)
-Fig_1.path <- paste0(fig.dir,'Fig._1._conceptual_hysteresis.png')
-Fig_2.path <- paste0(fig.dir,'Fig._2._disribution_and_bimodality.png')
-Fig_3.path <- paste0(fig.dir,'Fig._3._recruitment_mortality_feedbacks.png')
-
+Fig_1.path <- paste0(fig.dir,'Fig._1._distribution_and_bimodality.png')
+Fig_2.path <- paste0(fig.dir,'Fig._2._recruitment_mortality_feedbacks.png')
+Fig_3.path <- paste0(fig.dir,'Fig._3._demographic_simulations.png')
+Fig_4.path <- paste0(fig.dir,'Fig._4._hysteresis.png')
 
