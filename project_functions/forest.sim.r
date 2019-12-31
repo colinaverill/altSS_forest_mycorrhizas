@@ -70,6 +70,24 @@ forest.sim <- function(g.mod, r.mod.am, r.mod.em, m.mod,
       plot.list[[i]] <- tree.now
     }
   }
+  if(myco.split == 'all.em'){
+    plot.list <- list()
+    for(i in 1:n.plots){
+      em             <- c(rep(1, nrow(tree)))
+      tree.now       <- tree
+      tree.now$em    <- em
+      plot.list[[i]] <- tree.now
+    }
+  }
+  if(myco.split == 'all.am'){
+    plot.list <- list()
+    for(i in 1:n.plots){
+      em             <- c(rep(0, nrow(tree)))
+      tree.now       <- tree
+      tree.now$em    <- em
+      plot.list[[i]] <- tree.now
+    }
+  }
   
   #get plot table with plot level characteristics.
   plot.table <- list()
