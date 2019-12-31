@@ -9,9 +9,6 @@
 ### Use N processors on a single machine.
 #$ -pe omp 28
 #
-### Request buyin nodes
-#$ -l buyin
-#
 ### Give the job a name
 #$ -N inital_condition_hysteresis
 #
