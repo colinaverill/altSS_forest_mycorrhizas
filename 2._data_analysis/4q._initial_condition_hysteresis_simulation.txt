@@ -13,7 +13,7 @@
 #$ -l buyin
 #
 ### Give the job a name
-#$ -N hysteresis_sim
+#$ -N inital_condition_hysteresis
 #
 ### Merge stderr into the stdout file, to reduce clutter
 #$ -j y

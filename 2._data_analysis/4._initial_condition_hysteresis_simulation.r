@@ -22,6 +22,7 @@ n.cores <- detectCores()
 #Specify Ndep up and down ramp ranges and number of plots.----
 ndep.ramp.range <- seq(1,14)
 N.PLOTS <- 1000 #Must be even!
+N.STEPS <- 40  #40 steps = 200 years, longer to make sure it runs to something "stable".
 
 #Run ramp up models.----
 cat('Running all EM simulations...\n');tic()
@@ -41,7 +42,8 @@ for(i in 1:length(ndep.ramp.range)){
                myco.split = 'all.em', silent = T,
                disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
-               n.cores = n.cores)
+               n.cores = n.cores,
+               n.step = N.STEPS)
   )
   #Feedback model.
   em.alt[[i]] <- makeitwork(
@@ -53,7 +55,8 @@ for(i in 1:length(ndep.ramp.range)){
                myco.split = 'all.em', silent = T,
                disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
-               n.cores = n.cores)
+               n.cores = n.cores,
+               n.step = N.STEPS)
   )
   #report.
   msg <- paste0(i,' of ',length(ndep.ramp.range),' all EM simulations complete. ')
@@ -79,7 +82,8 @@ for(i in 1:length(ndep.ramp.range)){
                myco.split = 'all.am', silent = T,
                disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
-               n.cores = n.cores)
+               n.cores = n.cores,
+               n.step = N.STEPS)
   )
   #Feedback model.
   am.alt[[i]] <- makeitwork(
@@ -91,7 +95,8 @@ for(i in 1:length(ndep.ramp.range)){
                myco.split = 'all.am', silent = T,
                disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
-               n.cores = n.cores)
+               n.cores = n.cores,
+               n.step = N.STEPS)
   )
   #report.
   msg <- paste0(i,' of ',length(ndep.ramp.range),' all AM simulations complete. ')
