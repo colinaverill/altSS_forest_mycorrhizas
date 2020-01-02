@@ -22,7 +22,7 @@ n.cores <- detectCores()
 #Specify Ndep up and down ramp ranges and number of plots.----
 ndep.ramp.range <- seq(1,14)
 N.PLOTS <- 1000 #Must be even!
-N.STEPS <- 60  #60 steps = 300 years, longer to make sure it runs to something "stable".
+N.STEPS <- 120  #120 steps = 600 years, longer to make sure it runs to something "stable".
 
 #Run ramp up models.----
 cat('Running all EM simulations...\n');tic()
