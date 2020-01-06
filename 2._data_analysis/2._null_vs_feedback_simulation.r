@@ -1,5 +1,5 @@
 #running null and feedback simulations drawing sampling plot-level environmental conditions from dataset.
-#Takes ~14 minutes to run w/ 2 cores on pecan2.
+#~9 minutes using 4 cores on my 2014 macbook pro.
 rm(list=ls())
 source('paths.r')
 source('project_functions/forest.sim.r')
@@ -16,13 +16,13 @@ output.path <- null_vs_feedback_simulation_output.path
 set.seed(42069) #looks good!
 
 #load models and environmental covariates.----
-fits <- readRDS(demographic_fits.path) #trying with new density dependence for recruitment.
+fits <- readRDS(demographic_fits.path)
 env.cov <- data.frame(t(fits$env.cov))
 env.cov <- fits$all.cov
 N.PLOTS <- 1000 #Must be even!
 
 #register parallel environment.----
-n.cores <- detectCores() - 1 #minus 1 so your computer keeps running.
+n.cores <- detectCores()
 
 #Run drawwing from distribution of plot level environmental conditions.----
 #Null model.
