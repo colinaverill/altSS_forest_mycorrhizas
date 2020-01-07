@@ -1,6 +1,12 @@
 #Create gifs of null and feedback simulations.
 rm(list=ls())
+library(magick)
+library(purrr)
 source('paths.r')
+source('project_functions/make_gif.r')
+
+#set output path.----
+output.path <- Supp._gif_1.path
 
 #Generate file structure for outputs.----
 #set directory paths.
@@ -116,7 +122,11 @@ for(i in 1:length(year)){
   count.x1 <- table(x1.ref)
   x2.ref   <- cut(x2, n.breaks)
   count.x2 <- table(x2.ref)
-  limy <- c(0, max(c(count.x1, count.x2)))
+  check <- max(c(count.x1, count.x2))
+  #This doesn't work very well. Setting increments of ylimit by "hand".
+  if(check > 400)               {limy = c(0,500)}
+  if(check < 400 & check >= 300){limy = c(0,400)}
+  if(check < 300)               {limy = c(0,300)}
   
   #Drop plots and inner labels.
   #null histogram.
@@ -136,3 +146,12 @@ for(i in 1:length(year)){
   #end this particular plot.
   dev.off()
 }
+
+#Make your gif!----
+make_gif(all.gif.dir, output.path)
+
+#clean up files.----
+cmd <- paste0('rm -r ',gif.dir)
+system(cmd)
+
+#end script.----

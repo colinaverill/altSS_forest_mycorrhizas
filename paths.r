@@ -49,8 +49,9 @@ demographic_fits.path <- paste0(model.dir,'demographic_fits.rds')
 fig.dir <- 'figures/'
 cmd <- paste0('mkdir -p ',fig.dir)
 system(cmd)
-Fig_1.path <- paste0(fig.dir,'Fig._1._distribution_and_bimodality.png')
-Fig_2.path <- paste0(fig.dir,'Fig._2._recruitment_mortality_feedbacks.png')
-Fig_3.path <- paste0(fig.dir,'Fig._3._demographic_simulations.png')
-Fig_4.path <- paste0(fig.dir,'Fig._4._hysteresis.png')
+      Fig_1.path <- paste0(fig.dir,'Fig._1._distribution_and_bimodality.png')
+      Fig_2.path <- paste0(fig.dir,'Fig._2._recruitment_mortality_feedbacks.png')
+      Fig_3.path <- paste0(fig.dir,'Fig._3._demographic_simulations.png')
+      Fig_4.path <- paste0(fig.dir,'Fig._4._hysteresis.png')
+Supp._gif_1.path <- paste0(fig.dir,'Supp._gif_1.gif')
 
