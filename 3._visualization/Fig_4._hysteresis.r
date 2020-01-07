@@ -3,7 +3,7 @@ rm(list=ls())
 source('paths.r')
 
 #set output path.----
-output.path <- Fig_4.path
+output.path <- 'test.png'
 
 #generate conceptual figure data.-----
 x  <- seq(0,14,length.out=100)
@@ -22,8 +22,8 @@ adjust <- 1.07
 limy <- max(y3) * adjust
 plot(y3~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, xaxt='n', yaxt = 'n', bty = 'l', ylim = c(0, limy))
 lines(smooth.spline(y3~x,spar=0.35), lwd=3,lty=1)
-arrows(7.5, 0.7, 9.25, 0.3, lwd = 2, length = 0.1)
-arrows(7.5, 0.29, 5.75, 0.69, lwd = 2, length = 0.1)
+#arrows(7.5, 0.7, 9.25, 0.3, lwd = 2, length = 0.1)
+#arrows(7.5, 0.29, 5.75, 0.69, lwd = 2, length = 0.1)
 mtext('A',side=1,line=-1.5,adj=0.05, font = 2)
 #mtext('Probability EM dominated',side=2,line = 2.2)
 mtext('Frequency Ectomycorrhizal Forests',side=2,line = 3)
@@ -38,93 +38,87 @@ mtext('H0: Environmental Filtering', side = 3, adj = 0.05, line = -1.5)
 plot(y1~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, yaxt='n',xaxt='n', bty = 'l', ylim = c(0, limy))
 lines(smooth.spline(y1~x,spar=0.35), lwd=3,lty=2)
 lines(smooth.spline(y2~x,spar=0.35), lwd=3,lty=3)
-arrows(10.0, 0.7, 11.75, 0.3, lwd = 2, length = 0.1)
-arrows(5.0, 0.29, 3.25, 0.69, lwd = 2, length = 0.1)
+#arrows(10.0, 0.7, 11.75, 0.3, lwd = 2, length = 0.1)
+#arrows(5.0, 0.29, 3.25, 0.69, lwd = 2, length = 0.1)
 mtext('B',side=1,line=-1.5,adj=0.05, font = 2)
 text(x =  1.5, y = -0.1, 'low' , xpd = NA, cex = 1.2)
 text(x = 13.5, y = -0.1, 'high', xpd = NA, cex = 1.2)
 mtext('Nitrogen Deposition',side = 1, line = 2.5 )
-mtext('H1: Alt. Stable States', side = 3, adj = 0.05, line = -1.5)
+mtext('H1: Alternative Stable States', side = 3, adj = 0.05, line = -1.5)
 
 #legend.
-#legend(x=8.5,y= 1.05,legend=c("EM to AM","AM to EM"),lty=c(2,3),lwd=c(3,3), box.lwd=0, bg="transparent",cex=0.9)
+legend(x= 9.5,y= 0.95,legend=c("initially EM","initially AM"),lty=c(2,3),lwd=c(3,3), 
+       box.lwd=0, bg="transparent",cex=1)
 
-#Lower label.
-#mtext('Nitrogen Deposition', side=1, out=T, cex=1.5, line = 3)
-
-#Hysteresis data load and workup.----
+#hysteresis data load and workup.----
 #load data.
-d <- readRDS(factorial_hysteresis_simulation.path)
-#total number of plots simulated.
-n.tot <- nrow(d$ramp.up$nul$l1$plot.table)
+d <- readRDS(initial_condition_hysteresis_simulation.path)
+n.tot <- nrow(d$all.em$alt.GRM$l1$plot.table)
+n.lev <- length(d$all.am$alt.GRM)
 
-#Pick your models.
-up <- d$ramp.up  $alt.GRM
-down <- d$ramp.down$alt.GRM
-n.lev <- length(up)
-
-#count number of EM plots across simulations, and get a 95% bootstrap CI.
-#Ramp up N dep estimates.
-em.up    <- list()
-em.up.CI <- list()
-n.straps <- 1000
-for(i in 1:length(up)){
-  #grab plot table relEM vector
-  plot.vec <- up[[i]]$plot.table$relEM
-  em.up[[i]]  <- length(plot.vec[plot.vec > 0.9])
-  #perform bootstrap.
-  boot.out <- list()
-  for(k in 1:n.straps){
-    plot.sample <- sample(plot.vec, size = length(plot.vec), replace = T)
-    boot.out[[k]] <- length(plot.sample[plot.sample > 0.9])
+#get number of EM and AM plots in feedback simulations (>90%) and bootstrap CI.
+#starting from EM state.
+em.ramp <- list()
+for(i in 1:length(d$all.em$alt.GRM)){
+  plot.tab <- d$all.em$alt.GRM[[i]]$plot.table
+  N.em     <- nrow(plot.tab[plot.tab$relEM > 0.9,])
+  N.am     <- nrow(plot.tab[plot.tab$relEM < 0.1,])
+  #Get boostrap CI on mean.
+  boot.dat <-list()
+  for(k in 1:1000){
+    dat <- plot.tab[sample(nrow(plot.tab), nrow(plot.tab), replace = T),]
+    boot.em <- nrow(dat[dat$relEM > 0.9,])
+    boot.am <- nrow(dat[dat$relEM < 0.1,])
+    boot.dat[[k]] <- c(boot.em,boot.am)
   }
-  boot.out <- unlist(boot.out)
-  #calculate 95% CI.
-  em.up.CI[[i]] <- quantile(boot.out, probs = c(0.025, 0.975))
+  boot.dat <- do.call(rbind, boot.dat)
+  em.95 <- quantile(boot.dat[,1], probs = c(0.025, 0.975))
+  am.95 <- quantile(boot.dat[,2], probs = c(0.025, 0.975))
+  #return output.
+  em.ramp[[i]] <- c(N.em, N.am, em.95,am.95)
 }
-em.up <- unlist(em.up)
-em.up.CI <- do.call(rbind, em.up.CI)
-up <- data.frame(cbind(em.up, em.up.CI))
-colnames(up) <- c('n','lo95','hi95')
-up$ndep <- c(1:n.lev)
-
-#convert to frequency
-up$n    <- up$n    / n.tot
-up$lo95 <- up$lo95 / n.tot
-up$hi95 <- up$hi95 / n.tot
-
-#Ramp down Ndep estimates.
-em.down    <- list()
-em.down.CI <- list()
-n.straps <- 1000
-for(i in 1:length(down)){
-  #grab plot table relEM vector
-  plot.vec <- down[[i]]$plot.table$relEM
-  em.down[[i]]  <- length(plot.vec[plot.vec > 0.9])
-  #perform bootstrap.
-  boot.out <- list()
-  for(k in 1:n.straps){
-    plot.sample <- sample(plot.vec, size = length(plot.vec), replace = T)
-    boot.out[[k]] <- length(plot.sample[plot.sample > 0.9])
+em.ramp <- data.frame(do.call(rbind, em.ramp))
+colnames(em.ramp) <- c('N.em','N.am','em.lo95','em.hi95','am.lo95','am.hi95')
+#starting from AM state.
+am.ramp <- list()
+for(i in 1:length(d$all.am$alt.GRM)){
+  plot.tab <- d$all.am$alt.GRM[[i]]$plot.table
+  N.em     <- nrow(plot.tab[plot.tab$relEM > 0.9,])
+  N.am     <- nrow(plot.tab[plot.tab$relEM < 0.1,])
+  #Get boostrap CI on mean.
+  boot.dat <-list()
+  for(k in 1:1000){
+    dat <- plot.tab[sample(nrow(plot.tab), nrow(plot.tab), replace = T),]
+    boot.em <- nrow(dat[dat$relEM > 0.9,])
+    boot.am <- nrow(dat[dat$relEM < 0.1,])
+    boot.dat[[k]] <- c(boot.em,boot.am)
   }
-  boot.out <- unlist(boot.out)
-  #calculate 95% CI.
-  em.down.CI[[i]] <- quantile(boot.out, probs = c(0.025, 0.975))
+  boot.dat <- do.call(rbind, boot.dat)
+  em.95 <- quantile(boot.dat[,1], probs = c(0.025, 0.975))
+  am.95 <- quantile(boot.dat[,2], probs = c(0.025, 0.975))
+  #return output.
+  am.ramp[[i]] <- c(N.em, N.am, em.95,am.95)
 }
-em.down <- unlist(em.down)
-em.down.CI <- do.call(rbind, em.down.CI)
-down <- data.frame(cbind(em.down, em.down.CI))
+am.ramp <- data.frame(do.call(rbind, am.ramp))
+colnames(am.ramp) <- c('N.em','N.am','em.lo95','em.hi95','am.lo95','am.hi95')
+
+#convert to frequencies, assign n levels, rename as up and down.
+#renaming
+up   <- em.ramp[,c('N.em','em.lo95','em.hi95')]
+down <- am.ramp[,c('N.em','em.lo95','em.hi95')]
+colnames(  up) <- c('n','lo95','hi95')
 colnames(down) <- c('n','lo95','hi95')
-down$ndep <- c(n.lev:1)
-
-#convert to frequency
-down$n    <- down$n    / n.tot
-down$lo95 <- down$lo95 / n.tot
-down$hi95 <- down$hi95 / n.tot
+#convert to frequencies.
+  up <-   up / n.tot
+down <- down / n.tot
+#Assign ndep.
+up  $ndep <- c(1:n.lev)
+down$ndep <- c(1:n.lev)
 
 #Panel 3.  hysteresis simulation ramp up / ramp down.----
 par(mar = c(0,3,0,0))
 cols <- c('purple','light pink')
+#cols <- c('black','black')
 trans <- 0.3
 #plot ramp up, transitioning away from EM dominated forests.
 color <- cols[1]
@@ -140,8 +134,12 @@ lines(smooth.spline(down$n ~ down$ndep, spar = 0.1), lwd = 2, col = adjustcolor(
 polygon(c(down$ndep, rev(down$ndep)),c(down$hi95, rev(down$lo95)), col=adjustcolor(color, trans), lty=0)
 
 #arrows
-arrows(x0 = 5, y0 = .375, x1 = 9.0, y1 = .225, length = 0.1, lwd = 1.5)
-arrows(x0 = 7, y0 = 0.08, x1 = 3, y1 = 0.16, length = 0.1, lwd = 1.5)
+#arrows(x0 = 5, y0 = .375, x1 = 9.0, y1 = .225, length = 0.1, lwd = 1.5)
+#arrows(x0 = 7, y0 = 0.08, x1 = 3, y1 = 0.16, length = 0.1, lwd = 1.5)
+
+#legend.
+legend(x=8.5,y= 0.8,legend=c("initially EM","initially AM"),lty=1,lwd=2, col = cols, 
+         box.lwd=0, bg="transparent",cex= 1)
 
 #outer labels.
 #mtext('Number EM Dominated Forests', side =2, cex=1.2, line = 2.5)
