@@ -1,9 +1,9 @@
-#AM to EM hysteresis conceptual figure
+#AM - EM hysteresis conceptual figure and simulation result.
 rm(list=ls())
 source('paths.r')
 
 #set output path.----
-output.path <- 'test.png'
+output.path <- Fig_4.path
 
 #generate conceptual figure data.-----
 x  <- seq(0,14,length.out=100)
@@ -53,6 +53,14 @@ legend(x= 9.5,y= 0.95,legend=c("initially EM","initially AM"),lty=c(2,3),lwd=c(3
 #hysteresis data load and workup.----
 #load data.
 d <- readRDS(initial_condition_hysteresis_simulation.path)
+#grab results after 200 years, make these final plot tables to work with other code.
+time.step <- 41 #41 time steps = 200 years.
+for(i in 1:length(d$all.em$nul)){
+  d$all.em$nul    [[i]]$plot.table <- d$all.em$nul    [[i]]$super.table[[time.step]]
+  d$all.em$alt.GRM[[i]]$plot.table <- d$all.em$alt.GRM[[i]]$super.table[[time.step]]
+  d$all.am$nul    [[i]]$plot.table <- d$all.am$nul    [[i]]$super.table[[time.step]]
+  d$all.am$alt.GRM[[i]]$plot.table <- d$all.am$alt.GRM[[i]]$super.table[[time.step]]
+}
 n.tot <- nrow(d$all.em$alt.GRM$l1$plot.table)
 n.lev <- length(d$all.am$alt.GRM)
 
@@ -117,8 +125,7 @@ down$ndep <- c(1:n.lev)
 
 #Panel 3.  hysteresis simulation ramp up / ramp down.----
 par(mar = c(0,3,0,0))
-cols <- c('purple','light pink')
-#cols <- c('black','black')
+cols <- c('purple','green')
 trans <- 0.3
 #plot ramp up, transitioning away from EM dominated forests.
 color <- cols[1]
