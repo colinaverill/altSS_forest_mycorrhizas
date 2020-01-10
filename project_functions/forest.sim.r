@@ -1,6 +1,6 @@
 forest.sim <- function(g.mod, r.mod.am, r.mod.em, m.mod, 
                        initial_density = 20, n.plots = 100, n.step = 20,
-                       disturb_rate = 0,
+                       disturb_rate = 0.018,
                        step.switch = NA, switch.lev = NA, #if changing N level mid run.
                        env.cov = NA, n.cores = NA, silent = F,
                        myco.split = 'within_plot'){
