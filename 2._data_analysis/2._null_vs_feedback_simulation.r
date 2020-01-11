@@ -34,7 +34,7 @@ nul <-     forest.sim(g.mod    = fits$n.feedback$G.mod,
                       r.mod.em = fits$n.feedback$R.mod.em,
                       env.cov = env.cov, 
                       myco.split = 'between_plot',
-                      disturb_rate = 0.0476/2,
+                      #disturb_rate = 0.0476/2,
                       n.plots = N.PLOTS,
                       n.cores = n.cores)
 cat('null simulations complete. \n')
