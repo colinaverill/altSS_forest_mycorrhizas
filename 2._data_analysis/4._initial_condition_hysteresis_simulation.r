@@ -80,7 +80,7 @@ for(i in 1:length(ndep.ramp.range)){
                r.mod.em = fits$n.feedback$R.mod.em,
                env.cov = env.cov, 
                myco.split = 'all.am', silent = T,
-               disturb_rate = 0.0476/2,
+               #disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
                n.cores = n.cores,
                n.step = N.STEPS)
@@ -93,7 +93,7 @@ for(i in 1:length(ndep.ramp.range)){
                r.mod.em = fits$y.feedback$R.mod.em,
                env.cov = env.cov, 
                myco.split = 'all.am', silent = T,
-               disturb_rate = 0.0476/2,
+               #disturb_rate = 0.0476/2,
                n.plots = N.PLOTS,
                n.cores = n.cores,
                n.step = N.STEPS)
