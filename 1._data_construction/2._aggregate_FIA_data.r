@@ -26,6 +26,9 @@ data.list <- list(a.FIA.1,a.FIA.2,past2,past3)
 names(data.list) <- c('a.FIA.1','a.FIA.2','past2','past3')
 #turn off scientific notation.
 options(scipen = 999)
+#load nodDB database.
+nodDB <- data.table(read.csv(nodDB.path))
+FIA.spcd <- read.csv('required_products_utilities/mycorrhizal_SPCD_data.csv')
 
 #Remove quotes from CN values for both FIA data sets because they mess everything up.----
 for(i in 1:length(data.list)){
@@ -44,6 +47,17 @@ if(testing == T){
     data.list[[i]] <- data.list[[i]][data.list[[i]]$STATECD == 47,]
   }
 }
+
+#Assign N-fixation status.----
+yes.nfix  <- c('Rhizobia','likely_Rhizobia','Frankia','Nostocaceae','likely_present','Present')
+nodDB[Consensus.estimate %in% yes.nfix , nfix  := 1]
+fix.genera <- as.character(nodDB[nodDB$nfix == 1,]$genus)
+FIA.spcd$GENUS <- as.character(FIA.spcd$GENUS)
+FIA.spcd$nfix <- ifelse(FIA.spcd$GENUS %in% fix.genera, 1, 0)
+for(i in 1:length(data.list)){
+  data.list[[i]] <- merge(data.list[[i]], FIA.spcd[,c('SPCD','nfix')], all.x = T)
+}
+
 
 #Remove any plots that have "clear evidence of artificial regeneration." STDORGCD == 1. -----
 for(i in 1:length(data.list)){
@@ -97,17 +111,19 @@ for(i in 1:length(data.list)){
 }
 #Assign recruitment and ectomycorrhizal status at the individual level.----
 for(i in 1:length(data.list)){
-  data.list[[i]]$em         <- ifelse(data.list[[i]]$MYCO_ASSO == 'ECM', 1, 0)
-  data.list[[i]]$recruit    <- ifelse(is.na(data.list[[i]]$PREV_TRE_CN), 1, 0)
-  data.list[[i]]$recruit.em <- data.list[[i]]$recruit * data.list[[i]]$em
-  data.list[[i]]$recruit.am <- data.list[[i]]$recruit * abs(data.list[[i]]$em - 1)
+  data.list[[i]]$em           <- ifelse(data.list[[i]]$MYCO_ASSO == 'ECM', 1, 0)
+  data.list[[i]]$recruit      <- ifelse(is.na(data.list[[i]]$PREV_TRE_CN), 1, 0)
+  data.list[[i]]$recruit.em   <- data.list[[i]]$recruit * data.list[[i]]$em
+  data.list[[i]]$recruit.am   <- data.list[[i]]$recruit * abs(data.list[[i]]$em - 1)
+  data.list[[i]]$recruit.nfix <- data.list[[i]]$recruit * data.list[[i]]$nfix
   
 }
 #Flag trees that were living at beginning of interval for counting stem density later.----
 for(i in 1:length(data.list)){
-  data.list[[i]]$stem.live    <- ifelse(data.list[[i]]$recruit == 0                         , 1, 0)
-  data.list[[i]]$stem.live.am <- ifelse(data.list[[i]]$recruit == 0 & data.list[[i]]$em == 0, 1, 0)
-  data.list[[i]]$stem.live.em <- ifelse(data.list[[i]]$recruit == 0 & data.list[[i]]$em == 1, 1, 0)
+  data.list[[i]]$stem.live      <- ifelse(data.list[[i]]$recruit == 0                           , 1, 0)
+  data.list[[i]]$stem.live.am   <- ifelse(data.list[[i]]$recruit == 0 & data.list[[i]]$em   == 0, 1, 0)
+  data.list[[i]]$stem.live.em   <- ifelse(data.list[[i]]$recruit == 0 & data.list[[i]]$em   == 1, 1, 0)
+  data.list[[i]]$stem.live.nfix <- ifelse(data.list[[i]]$recruit == 0 & data.list[[i]]$nfix == 1, 1, 0)
 }
 
 #Determine if a tree died over measurement interval at the individual level.----
@@ -158,7 +174,7 @@ for(i in 1:length(data.list)){
   data.list[[i]]$BASAL <- ifelse(data.list[[i]]$AGENTCD > 0, NA, data.list[[i]]$BASAL)
 }
 
-#calculate current basal area of all trees by mycorrhizal type and PFT.----
+#calculate current basal area of all trees by mycorrhizal type, nfix and PFT.----
 #myc type
 for(i in 1:length(data.list)){
   for(k in 1:length(em.list)){
@@ -175,6 +191,10 @@ for(i in 1:length(data.list)){
     setnames(data.list[[i]], 'new', name)
   }
 }
+#nfix
+for(i in 1:length(data.list)){
+  data.list[[i]]$BASAL.nfix <- data.list[[i]]$BASAL * data.list[[i]]$nfix
+}
 
 #begin aggregation of tree-level data to plot level.----
 scaled.list <- list()
@@ -189,6 +209,8 @@ for(i in 1:length(data.list)){
 }
 
 #aggregate basal area per plot by myctype and PFT.----
+#add nfix to all.list
+all.list <- c(all.list,'nfix')
 for(i in 1:length(scaled.list)){
   for(k in 1:length(all.list)){
     name <- paste0('BASAL.',all.list[k])
@@ -197,17 +219,19 @@ for(i in 1:length(scaled.list)){
   }
 }
 
-#Get plot level recruitment and stem density, broken out by AM and EM.----
+#Get plot level recruitment and stem density, broken out by AM, EM and nfix.----
 for(i in 1:length(scaled.list)){
   #Pay special attention to cases where all trees in plot are new recruits.
   #recruitment.
-  scaled.list[[i]]$recruit    <- aggregate(recruit    ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$recruit.am <- aggregate(recruit.am ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$recruit.em <- aggregate(recruit.em ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$recruit      <- aggregate(recruit      ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$recruit.am   <- aggregate(recruit.am   ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$recruit.em   <- aggregate(recruit.em   ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$recruit.nfix <- aggregate(recruit.nfix ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
   #stem density.
-  scaled.list[[i]]$stem.density <- aggregate(stem.live    ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$  em.density <- aggregate(stem.live.am ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$  am.density <- aggregate(stem.live.em ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$stem.density <- aggregate(stem.live      ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$  em.density <- aggregate(stem.live.am   ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$  am.density <- aggregate(stem.live.em   ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$nfix.density <- aggregate(stem.live.nfix ~ PLT_CN, FUN = 'sum', data = data.list[[i]],na.rm=T,na.action=na.pass)[,2]
 }
 
 #pop in relevant data from plot table by taking medians.----
@@ -222,7 +246,8 @@ for(i in 1:length(scaled.list)){
   scaled.list[[i]]$n.trees     <- data.list[[i]][, .N, by = PLT_CN][,2]
   scaled.list[[i]]$PREV_PLT_CN <- aggregate(data.list[[i]]$PREV_PLT_CN ~ data.list[[i]]$PLT_CN, FUN='unique', na.action = na.pass)[,2]
   #calculate relative abundance of EM trees at time of soil sampling and total EM + AM
-  scaled.list[[i]]$relEM    <- scaled.list[[i]]$BASAL.ECM / scaled.list[[i]]$plot.BASAL
+  scaled.list[[i]]$relEM    <- scaled.list[[i]]$BASAL.ECM  / scaled.list[[i]]$plot.BASAL
+  scaled.list[[i]]$relNfix  <- scaled.list[[i]]$BASAL.nfix / scaled.list[[i]]$plot.BASAL
   scaled.list[[i]]$relEM.AM <- (scaled.list[[i]]$BASAL.ECM + scaled.list[[i]]$BASAL.AM) / scaled.list[[i]]$plot.BASAL
 }
 
@@ -260,7 +285,7 @@ cat('Building individual level product 2...\n')
 #Growth and Mortality is modeled at the individual tree level. Take most recent data.
 Product_2 <- data.list[[2]]
 scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
-Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,stem.density,em.density,am.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
+Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,relNfix,stem.density,em.density,am.density,nfix.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
 
 #This used to loop through multiple dataframes, hence the list. Could drop in past time points if you like, get temporal variation in growth and mortality.
 #mort.list <- list(data.list[[2]])

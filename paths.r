@@ -17,6 +17,9 @@ if(host == 'pecan2'){
   FIAdb.path <- paste0(FIA7.dir.path,'FIA7.sqlite')
 }
 
+#other (small) database paths.----
+nodDB.path <- 'required_products_utilities/nodDB_v1.csv'
+
 #FIA filtered output paths.----
 fia.dir <- paste0(storage.dir,'FIA_output/')
 cmd <- paste0('mkdir -p ',fia.dir)
