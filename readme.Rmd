@@ -1,4 +1,7 @@
-## Alternative Stable states of the Forest Mycobiome
+---
+title: "Alternative Stable States of the Forest Mycobiome"
+output: github_document
+---
 This R project contains all code to replicate analyses and figures presented in Averill et al. 202x. Alternative Stable States of the Forest Mycobiome.
 
 The file `paths.r` is sourced at the top of all analysis and figures scripts. This file tracks all file paths within the project. To run this code, the user needs to change the path object `storage.dir` within the paths.r file to match the location of the data directory on their computer. If you run this analysis on multiple computers you will need a few conditional statements to specify where the data directory is, as well as a way to sync files across the computers (more on this below). Furthermore, you will need a copy of the US Forest Inventory and Analysis Database (FIA database), version 7. This project uses a pSQL version of this database. The path to this directory of files needs to be specified in `paths.r`. I have kept the FIA7 directory out of the overall storage directory because the FIA database is huge.
