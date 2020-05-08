@@ -6,17 +6,15 @@
 rm(list=ls())
 library(data.table)
 library(RSQLite)
+library(doParallel)
 source('paths.r')
-
-#Some functions to make life easier.----
-sumNA  = function(x)  sum(x,na.rm=T)
-meanNA = function(x) mean(x,na.rm=T)
-maxNA  = function(x)  max(x,na.rm=T)
-tic = function() assign("timer", Sys.time(), envir=.GlobalEnv)
-toc = function() print(Sys.time()-timer)
+source('project_functions/tic_toc.r')
 
 #Connect to FIA7 database.----
 con <- dbConnect(SQLite(), dbname = FIAdb.path)
+
+#register parallel environment.----
+registerDoParallel(cores=8) #8 cores on my laptop.
 
 #File paths to reference data.----
 file.pft = "required_products_utilities/gcbPFT.csv"
@@ -93,27 +91,12 @@ PC <- data.table(PC)
 rm(PLOT,COND, SUBP_COND)
 
 ###---Query TREE table.----
-cat("Query TREE...\n")
-
-#Convert PLT_CN codes from character to numeric, remove quotes.
-     PC$PLT_CN_filter <- as.numeric(gsub('"', "", PC$PLT_CN))
-PC$PREV_PLT_CN_filter <- as.numeric(gsub('"', "", PC$PREV_PLT_CN))
-
-#build an empty data.table to store output. 
-variables_to_extract <- c('cn','prev_tre_cn','plt_cn','invyr','condid','dia','tpa_unadj','carbon_ag','carbon_bg',
-                          'spcd','stocking','statuscd','prevdia','prev_status_cd','p2a_grm_flg','reconcilecd',
-                          'agentcd','tpamort_unadj','diahtcd','ht','htcd','actualht','cclcd')
-out <- data.frame(matrix(NA, nrow = 0, ncol = length(variables_to_extract)))
-colnames(out) <- variables_to_extract
-out <- data.table(out)
-setnames(out, toupper(names(out)))
-
-#this for loop could be dropped in parallel.
+cat("Query TREE...\n") #This takes ~5.1 minutes on 8-core macbook running in parallel.
 #really I should just query ones that match the file.soil PLT_CN vector. But. SQL queries hate me. So I'm doing this.
 #querying based on the 'of_interest' PLT_CN values would probably speed this up a ton.
-#could also query in parallel using the doParallel package and a foreach loop.
 tic()
-for(i in 1:length(states)){
+TREE <- 
+foreach(i = 1:length(states)) %dopar% {
   query = paste('select CN, PREV_TRE_CN, PLT_CN, INVYR, CONDID, DIA, TPA_UNADJ, CARBON_AG, CARBON_BG,
               SPCD, STOCKING, STATUSCD, PREVDIA, PREV_STATUS_CD, P2A_GRM_FLG, RECONCILECD, AGENTCD, TPAMORT_UNADJ,
               DIAHTCD, HT, HTCD, ACTUALHT, CCLCD
@@ -121,10 +104,11 @@ for(i in 1:length(states)){
                 WHERE (PREVDIA>5 OR DIA>5) AND (STATUSCD=1 OR PREV_STATUS_CD=1) AND 
                 STATECD IN (', paste(states[i],collapse=','), ')')
   pre.tree = as.data.table(dbGetQuery(con, query))
-  out <- rbind(out,pre.tree)
-  cat(paste0(i,' of ',length(states),' states queried.\n'));toc()
+  return(pre.tree)
 }
-TREE <-out
+toc()
+#collapse dataframe.
+TREE <- do.call(rbind, TREE)
 
 ###--- Filter TREE table.----
 cat("Filter TREE ...\n")
@@ -133,12 +117,12 @@ TREE = TREE[PLT_CN %in% PC$PLT_CN,]
 
 # CONDID ("Remove edge effects" --TA)
 #Colin- this is calculated but never used to filter. Can probably drop.
-TREE[, CONmax := maxNA(CONDID), by=PLT_CN]
+TREE[, CONmax := max(CONDID, na.rm = T), by=PLT_CN]
 
 # STATUSCD
 #Get largest statuscd observe within a plot.
 # *** RK: Next line looks wrong. It's a sum, not max, despite the name. I did rewrite the line but this is equivalent to what Travis had so keeping for now.
-TREE[, STATUSCDmax := sumNA(3*as.integer(STATUSCD==3)), by=PLT_CN]
+TREE[, STATUSCDmax := sum(3*as.integer(STATUSCD==3), na.rm = T), by=PLT_CN]
 
 # RECONCILECD. This is just signaling that a tree isn't a new tree to the plot.
 TREE[is.na(RECONCILECD), RECONCILECD :=0] # Set NA values to 0.
@@ -178,6 +162,10 @@ all.present <- merge(TREE.present, PC.present, by = 'PLT_CN')
 all.past1   <- merge(TREE.past1  , PC.past1  , by = 'PLT_CN')
 all.past2   <- merge(TREE.past2  , PC.past2  , by = 'PLT_CN')
 all.past3   <- merge(TREE.past3  , PC.past3  , by = 'PLT_CN')
+#grab data for composite.
+for.composite <- all.present[,.(PLT_CN,LAT,LON)]
+for.composite <- for.composite[!duplicated(for.composite),]
+for.composite$PLT_CN <- as.numeric(gsub('"', "",for.composite$PLT_CN))
 
 #save outputs.----
 cat("Saving output...\n")
@@ -186,6 +174,7 @@ saveRDS(all.present,file = all.present.path)
 saveRDS(all.past1  ,file = all.past1.path  )
 saveRDS(all.past2  ,file = all.past2.path  )
 saveRDS(all.past3  ,file = all.past3.path  )
+write.csv(for.composite, data_for_composite.path)
 toc()
 ###end script.
 cat("Script complete.\n")
