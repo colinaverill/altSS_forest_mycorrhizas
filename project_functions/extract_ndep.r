@@ -6,8 +6,9 @@ extract_ndep <- function(longitude,latitude,
                          castnet.dir = '/projectnb/talbot-lab-data/caverill/CASTNET_Ndep/'
                          ){
   host <- system('hostname', intern = T)
-  if(host == 'pecan2'){castnet.dir = '/fs/data3/caverill/CASTNET_Ndep/'}
-  if(host == 'colins-MBP'){castnet.dir <- '/Users/colinaverill/Documents/data_storage/CASTNET_Ndep/'}
+  if(host == 'pecan2')          {castnet.dir = '/fs/data3/caverill/CASTNET_Ndep/'}
+  if(host == 'colins-MBP')      {castnet.dir <- '/Users/colinaverill/Documents/data_storage/CASTNET_Ndep/'}
+  if(grepl('ethz.ch',host) == T){castnet.dir <- '/Users/colinaverill/Documents/data_storage/CASTNET_Ndep/'}
   #load dry deposition rasters
   dry.list <- list()
   for(i in 0:15){
@@ -46,8 +47,8 @@ extract_ndep <- function(longitude,latitude,
   wet.dep <- Reduce('+',wet.out) / length(wet.out)
   
   #total ndep and output.
-  n.dep <- dry.dep + wet.dep
-  output <- data.frame(n.dep, dry.dep, wet.dep)
+  ndep <- dry.dep + wet.dep
+  output <- data.frame(ndep, dry.dep, wet.dep)
   
   return(output)
 }

@@ -91,7 +91,7 @@ PC <- data.table(PC)
 rm(PLOT,COND, SUBP_COND)
 
 ###---Query TREE table.----
-cat("Query TREE...\n") #This takes ~5.1 minutes on 8-core macbook running in parallel.
+cat("Query TREE...\n") #This takes ~5-10 minutes on 8-core macbook running in parallel.
 #really I should just query ones that match the file.soil PLT_CN vector. But. SQL queries hate me. So I'm doing this.
 #querying based on the 'of_interest' PLT_CN values would probably speed this up a ton.
 tic()
