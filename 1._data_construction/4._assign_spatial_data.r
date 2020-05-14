@@ -10,12 +10,15 @@ library(data.table)
 library(raster)
 
 #set output paths.----
+#they are the same as the input paths. Colin, you should know better.
 
 #load data.----
-d <- readRDS(Product_1.path)
+p1 <- readRDS(Product_1.path)
+p2 <- readRDS(Product_2.path)
 composite <- fread(data_from_composite.path)
 #Subset to plots actually in data we're working with.
-#composite <- output[output$PLT_CN %in% d$PLT_CN,] #broken because the PLT_CN I sent vs. received don't match. Asking Johan.
+composite$PLT_CN <-as.numeric(composite$PLT_CN)
+composite <- composite[composite$PLT_CN %in% p1$PLT_CN,]
 
 
 #Drop a few things from the composite linked to the soil feedbacks, or from maps derived from composite.----
@@ -69,4 +72,8 @@ setnames(output,c('WorldClim2_Annual_Mean_Temperature','WorldClim2_Annual_Precip
 #assign N deposition.----
 output <- cbind(output,extract_ndep(output$longitude,output$latitude))
 
-#save output.----
+#append environmental stats to p1 and p2, save.----
+p1 <- merge(p1, output, all.x = T, by = 'PLT_CN')
+p2 <- merge(p2, output, all.x = T, by = 'PLT_CN')
+saveRDS(p1, Product_1.path)
+saveRDS(p2, Product_2.path)
