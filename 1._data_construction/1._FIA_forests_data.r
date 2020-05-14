@@ -166,6 +166,7 @@ all.past3   <- merge(TREE.past3  , PC.past3  , by = 'PLT_CN')
 for.composite <- all.present[,.(PLT_CN,LAT,LON)]
 for.composite <- for.composite[!duplicated(for.composite),]
 for.composite$PLT_CN <- as.numeric(gsub('"', "",for.composite$PLT_CN))
+colnames(for.composite) <- c('PLT_CN','latitude','longitude')
 
 #save outputs.----
 cat("Saving output...\n")
