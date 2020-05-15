@@ -49,7 +49,8 @@ cmd <- paste0('mkdir -p ',model.dir)
 system(cmd)
 
 #GAM fits.
-demographic_fits.path <- paste0(model.dir,'demographic_fits.rds')
+   demographic_fits.path <- paste0(model.dir,'demographic_fits.rds')
+rf_demographic_fits.path <- paste0(model.dir,'rf_demographic_fits.rds')
 #Demographic simulation output paths.
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
            factorial_hysteresis_simulation.path <- paste0(model.dir,'factorial_hysteresis_simulation.rds')
