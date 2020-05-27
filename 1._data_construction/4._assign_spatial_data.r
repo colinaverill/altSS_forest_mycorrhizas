@@ -20,6 +20,13 @@ composite <- fread(data_from_composite.path)
 composite$PLT_CN <-as.numeric(composite$PLT_CN)
 composite <- composite[composite$PLT_CN %in% p1$PLT_CN,]
 
+#drop columns if you've already assigned and are reassigning for some reason.----
+to.drop <- colnames(p1)[grep(c('mat|map|ndep|dry.dep|wet.dep|PC|ecoregion'),colnames(p1))]
+p1 <- p1[,!(colnames(p1) %in% to.drop)]
+to.drop <- colnames(p2)[grep(c('mat|map|ndep|dry.dep|wet.dep|PC|ecoregion'),colnames(p2))]
+to.drop <- to.drop[!(to.drop %in% c('SPCD'))]
+p2 <- as.data.frame(p2)
+p2 <- p2[,!(colnames(p2) %in% to.drop)]
 
 #Drop a few things from the composite linked to the soil feedbacks, or from maps derived from composite.----
 composite <- composite[, grep("CHELSA" , colnames(composite)):=NULL]        #CHELSEA variables redundant w/ worldclim.
@@ -71,6 +78,14 @@ setnames(output,c('WorldClim2_Annual_Mean_Temperature','WorldClim2_Annual_Precip
 
 #assign N deposition.----
 output <- cbind(output,extract_ndep(output$longitude,output$latitude))
+
+#assign EPA ecoregions.----
+ecoregions <- raster::shapefile(EPA_L2_ecoregions_raster.path)           #load shape file.
+ecoregions <- spTransform(ecoregions, CRS('+proj=longlat +datum=WGS84')) #re-project raster to WGS84.
+pts <- cbind(output$longitude, output$latitude)                          #bind up your points.
+ecoreg.assign <- raster::extract(ecoregions, pts)                         #extract raster.
+output$ecoregion <- ecoreg.assign$NA_L2NAME
+
 
 #append environmental stats to p1 and p2, save.----
 p1 <- merge(p1, output, all.x = T, by = 'PLT_CN')

@@ -1,5 +1,5 @@
 #Subset p1 and p2 to get a random stratified sampling for fitting models quicky.
-#CURRENTLY SUBSETS TO NORTHEAST US.
+#CURRENTLY SUBSETS TO 2K PLOTS. Easy to subset by region.
 rm(list=ls())
 source('paths.r')
 library(ggplot2)
@@ -10,7 +10,7 @@ library(data.table)
 output.path <- Product_2.subset.path
 
 #load data.----
-p2 <- readRDS(Product_2.path)
+p2 <- data.table(readRDS(Product_2.path))
 states <- read.csv('required_products_utilities/FIA_state_codes_regions.csv')
 states.east <- states[states$east_plus == 1,]
 states$northeast <- ifelse(states$state_name %in% c('Connecticut','New York','Massachusetts','Rhode Island','New Hampshire','Vermont','Maine'),1,0)
@@ -19,6 +19,8 @@ states$northeast <- ifelse(states$state_name %in% c('Connecticut','New York','Ma
 #Would be nice to move these to full data filtering script (#2).
 p2 <- p2[p2$REMPER >=4.9 & p2$REMPER <= 5.1,]
 p2 <- p2[p2$n.trees >  5,]
+p2 <- p2[DIA.cm > 0,]
+
 #Complete cases of environmental covariates.
 env.drop <- p2[,c('PLT_CN','ndep','mat','map','PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10')]
 env.drop <- env.drop[!complete.cases(env.drop),]
@@ -34,9 +36,9 @@ d <- unique(d)
 #subset to eastern US.
 d <- d[d$STATECD %in% states.east$STATECD,]
 #NORTHEAST FOR TESTING.
-d <- d[d$STATECD %in% states[states$northeast == 1,]$STATECD,]
+#d <- d[d$STATECD %in% states[states$northeast == 1,]$STATECD,]
 #set.seed(42069)
-#n.plots <- 4000 #set number of plots to subsample.
+#n.plots <- 2000 #set number of plots to subsample.
 #d <- d[sample(nrow(d), n.plots),]
 p2 <- p2[PLT_CN %in% d$PLT_CN,]
 
