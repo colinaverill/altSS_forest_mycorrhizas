@@ -19,6 +19,7 @@ registerDoParallel(cores=8) #8 cores on my laptop.
 #File paths to reference data.----
 file.pft = "required_products_utilities/gcbPFT.csv"
 file.myc = "required_products_utilities/mycorrhizal_SPCD_data.csv"
+file.gym = "required_products_utilities/gymnosperm_family_genera.csv"
 
 #state codes.----
 states <- read.csv('required_products_utilities/FIA_state_codes_regions.csv')
@@ -31,7 +32,7 @@ states <- paste0('(',states,')')
 cat("Query PLOT...\n")
 tic()
 query <- paste("select 
-                CN, STATECD, PREV_PLT_CN, REMPER, LAT, LON, ELEV 
+                CN, STATECD, PREV_PLT_CN, REMPER, LAT, LON, ELEV, COUNTYCD 
                 from 
                 PLOT 
                 where 
@@ -143,10 +144,13 @@ setnames(TREE,'CN','TRE_CN')
 cat("Merge in PFTs and mycorrhizal associations...\n")
 MCDPFT     = as.data.table(read.csv(file.pft, header = T)) #load in PFT assignments. Mike Dietze (MCD) made this file long ago.
 CA_myctype = as.data.table(read.csv(file.myc, header = T)) #load in mycorrhizal associations.
-CA_myctype = CA_myctype[,c("SPCD","MYCO_ASSO"),with=F]
+CA_myctype = CA_myctype[,c("SPCD","MYCO_ASSO","GENUS","SPECIES"),with=F]
 TREE = merge(TREE, MCDPFT    , all.x=T, by = "SPCD")
 TREE = merge(TREE, CA_myctype, all.x=T, by = "SPCD")
 
+#Assign whether or not a tree is a gymnosperm.----
+gymnosperm <- read.csv(file.gym)
+TREE$gymno <- ifelse(TREE$GENUS %in% gymnosperm$genus, 1, 0)
 
 #Link together temporal sequences of trees and PC plot codes.----
 PC.present   <-   PC[!(PLT_CN %in% PREV_PLT_CN),] #newest observations are not a PREV_PLT_CN of anything.
