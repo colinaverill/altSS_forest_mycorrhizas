@@ -29,22 +29,22 @@ kk <- 5
 #Environmental models without feedbacks.
 R.mod.em <- gam(recruit.em ~         s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d1, family = 'poisson')
+                data = d1, family = 'poisson', method = 'REML')
 R.mod.am <- gam(recruit.am ~         s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d1, family = 'poisson')
+                data = d1, family = 'poisson', method = 'REML')
 M.mod.em <- gam(mortality ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 1,], family = 'binomial')
+                data = d2[d2$em == 1,], family = 'binomial', method = 'REML')
 M.mod.am <- gam(mortality ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 0,], family = 'binomial')
+                data = d2[d2$em == 0,], family = 'binomial', method = 'REML')
 G.mod.em <- gam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 1,])
+                data = d2[d2$em == 1,], method = 'REML')
 G.mod.am <- gam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 0,])
+                data = d2[d2$em == 0,], method = 'REML')
 #wrap output and name.
 n.feedback <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em)
 names(n.feedback) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R.mod.em')
@@ -56,22 +56,22 @@ if(gam == T){
   cat('Fitting feedback models...\n');tic()
   R.mod.em <- gam(recruit.em ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d1, family = 'poisson')
+                  data = d1, family = 'poisson', method = 'REML')
   R.mod.am <- gam(recruit.am ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d1, family = 'poisson')
+                  data = d1, family = 'poisson', method = 'REML')
   M.mod.em <- gam(mortality  ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 1,], family = 'binomial')
+                  data = d2[d2$em == 1,], family = 'binomial', method = 'REML')
   M.mod.am <- gam(mortality  ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 0,], family = 'binomial')
+                  data = d2[d2$em == 0,], family = 'binomial', method = 'REML')
   G.mod.em <- gam(DIA.cm   ~  s(relEM, k = kk) +  s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 1,])
+                  data = d2[d2$em == 1,], method = 'REML')
   G.mod.am <- gam(DIA.cm   ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 0,])
+                  data = d2[d2$em == 0,], method = 'REML')
   cat('Feedback models fit.\n');toc()
 }
 

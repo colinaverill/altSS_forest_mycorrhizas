@@ -47,6 +47,7 @@ p2 <- p2[PLT_CN %in% d$PLT_CN,]
 #plot subset to make sure its representative.----
 plot = T
 if(plot == T){
+  par(mfrow = c(1,1))
   library(rworldmap)
   lon <- d$LON
   lat <- d$LAT

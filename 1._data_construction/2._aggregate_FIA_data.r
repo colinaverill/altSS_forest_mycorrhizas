@@ -236,13 +236,14 @@ for(i in 1:length(scaled.list)){
 
 #pop in relevant data from plot table by taking medians.----
 for(i in 1:length(scaled.list)){
-  scaled.list[[i]]$latitude    <- aggregate(data.list[[i]]$LAT     ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$longitude   <- aggregate(data.list[[i]]$LON     ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$elevation   <- aggregate(data.list[[i]]$ELEV    ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$INVYR       <- aggregate(data.list[[i]]$INVYR   ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$STATECD     <- aggregate(data.list[[i]]$STATECD ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$STDAGE      <- aggregate(data.list[[i]]$STDAGE  ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
-  scaled.list[[i]]$REMPER      <- aggregate(data.list[[i]]$REMPER  ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$latitude    <- aggregate(data.list[[i]]$LAT      ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$longitude   <- aggregate(data.list[[i]]$LON      ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$elevation   <- aggregate(data.list[[i]]$ELEV     ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$INVYR       <- aggregate(data.list[[i]]$INVYR    ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$STATECD     <- aggregate(data.list[[i]]$STATECD  ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$COUNTYCD    <- aggregate(data.list[[i]]$COUNTYCD ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$STDAGE      <- aggregate(data.list[[i]]$STDAGE   ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
+  scaled.list[[i]]$REMPER      <- aggregate(data.list[[i]]$REMPER   ~ data.list[[i]]$PLT_CN, FUN='median',na.rm=T,na.action=na.pass)[,2]
   scaled.list[[i]]$n.trees     <- data.list[[i]][, .N, by = PLT_CN][,2]
   scaled.list[[i]]$PREV_PLT_CN <- aggregate(data.list[[i]]$PREV_PLT_CN ~ data.list[[i]]$PLT_CN, FUN='unique', na.action = na.pass)[,2]
   #calculate relative abundance of EM trees at time of soil sampling and total EM + AM
@@ -286,17 +287,6 @@ cat('Building individual level product 2...\n')
 Product_2 <- data.list[[2]]
 scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
 Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,relNfix,stem.density,em.density,am.density,nfix.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
-
-#This used to loop through multiple dataframes, hence the list. Could drop in past time points if you like, get temporal variation in growth and mortality.
-#mort.list <- list(data.list[[2]])
-
-#Need to use previous PLT_CN values. Must also merge in relative abundance EM for downstream filtering.----
-#This happens because there used to be more data sets in the list.
-#Product_2      <- mort.list[[1]]
-
-#This will remove sites that didn't make it through Product_1 filtering, which is great.
-#scaled.list[['a.FIA.2']] <- data.table(scaled.list[['a.FIA.2']])
-#Product_2      <- merge(Product_2     ,scaled.list[['a.FIA.2']][,.(relEM,relEM.AM,stem.density,em.density,am.density,plot.BASAL,PLT_CN)], by = 'PLT_CN') 
 
 #save Product 2 output.----
 saveRDS(Product_2, Product_2.path, version = 2)
