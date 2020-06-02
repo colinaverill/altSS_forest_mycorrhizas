@@ -12,6 +12,7 @@ output.path <- demographic_fits_gam_separate_plus_re.path
 #load growth/mortality/recruitment data.----
 d1 <- data.table(readRDS(Product_1.path))
 d2 <- data.table(readRDS(Product_2.subset.path))
+d1$n.trees <- NULL
 
 #Subset and rename some things.-----
 d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
