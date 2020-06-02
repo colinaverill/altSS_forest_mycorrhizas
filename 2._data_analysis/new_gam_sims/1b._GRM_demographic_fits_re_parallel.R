@@ -30,6 +30,7 @@ bs <- 'cr' #thin plate regression splines too slow, and results are similar.
 
 #Fit growth, recruitment and mortality models.----
 #Environmental models without feedbacks.
+cat('Fitting null models...\n');tic()
 R.mod.em <- bam(recruit.em ~         s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
                   s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k =kk, bs=bs), 
                 data = d1, family = 'poisson', cluster = cl)
@@ -51,6 +52,7 @@ G.mod.em <- bam(DIA.cm   ~            s(ndep, k = kk, bs=bs) + s(BASAL.plot, k =
 G.mod.am <- bam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) + s(PLT_CN, bs = 're') +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
                 data = d2[d2$em == 0,], cluster = cl)
+cat('Null models fit.\n');toc()
 #wrap output and name.
 n.feedback <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em)
 names(n.feedback) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R.mod.em')
