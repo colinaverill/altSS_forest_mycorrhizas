@@ -15,12 +15,12 @@ forest.sim <- function(g.mod.am, g.mod.em,
   if("doParallel" %in% (.packages()) == F){
     library(doParallel)
   }
-  #check if random forest is installed.
-  if('doParallel' %in% rownames(installed.packages()) == F){
+  #check if randomForest is installed.
+  if('randomForest' %in% rownames(installed.packages()) == F){
     stop('This function requires the randomForest package, please install it.\n')
   }
-  #If doParallel is not loaded, load it.
-  if("doParallel" %in% (.packages()) == F){
+  #If randomForest is not loaded, load it.
+  if("randomForest" %in% (.packages()) == F){
     library(randomForest)
   }
   #Check if rowr is installed.
