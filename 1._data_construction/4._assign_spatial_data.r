@@ -46,9 +46,9 @@ composite <- composite[, grep(".geo", colnames(composite)):=NULL]           #thi
 composite <- composite[, grep("Abs_Lat", colnames(composite)):=NULL]        #latitude not going in.
 composite <- composite[, grep("Nadir", colnames(composite)):=NULL]          #wtf is nadir reflectance. 
 composite <- composite[, grep("Fpar", colnames(composite)):=NULL]           #this is nothing.
-composite <- composite[, grep("Npp", colnames(composite)):=NULL]            #this is NPP not relevant at plot level where we have direct observation.
-composite <- composite[, grep("Gpp", colnames(composite)):=NULL]            #this is NPP not relevant at plot level where we have direct observation.
-composite <- composite[, grep("_EVI", colnames(composite)):=NULL]           #this is a billion vegetation indices.
+composite <- composite[, grep("Npp", colnames(composite)):=NULL]            #NPP not relevant at plot level where we have direct observation.
+composite <- composite[, grep("Gpp", colnames(composite)):=NULL]            #GPP not relevant at plot level where we have direct observation.
+composite <- composite[, grep("EVI", colnames(composite)):=NULL]            #this is a billion vegetation indices.
 composite <- composite[, grep("EnvTexture", colnames(composite)):=NULL]     #this is a few diversity indices.
 
 #Drop plots with missing values.----

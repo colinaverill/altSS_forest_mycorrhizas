@@ -16,8 +16,8 @@ system(cmd)
 FIA7.dir.path <- '/fs/data3/caverill/FIA7/'
 if(host == 'colins-MBP'      ){FIA7.dir.path <- '/Users/colinaverill/Documents/data_storage/FIA7/'}
 if(grepl('ethz.ch',host) == T){FIA7.dir.path <- '/Users/colinaverill/Documents/data_storage/FIA7/'}
-cmd <- paste0('mkdir -p ',FIA7.dir.path)
-system(cmd)
+#cmd <- paste0('mkdir -p ',FIA7.dir.path)
+#system(cmd)
 FIAdb.path <- paste0(FIA7.dir.path,'FIA7.sqlite')
 
 #Other raster data outside of main storage directory.----
@@ -59,6 +59,7 @@ rf_demographic_fits_interactive.path <- paste0(model.dir,'rf_demographic_fits_in
 demographic_fits_gam_separate.path <- paste0(model.dir,'demographic_fits_gam_separate.rds')
 demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ecoregion.rds')
   demographic_fits_gam_species.path <- paste0(model.dir,'demographic_fits_gam_species.rds')
+  demographic_fits_gam_separate_plus_re.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re.rds')
 
 #Demographic simulation output paths.
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
