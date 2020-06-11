@@ -21,7 +21,7 @@ null <- forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.model
                    m.mod.am = d$null.models$mort.mod.am, m.mod.em = d$null.models$mort.mod.em,
                    myco.split = 'between_plot',
                    env.cov = d$env.cov,
-                   n.cores = 8,
+                   n.cores = 28,
                    n.plots = 500, n.step = 40)
 cat('Null models fit.\n')
 toc()
@@ -34,7 +34,7 @@ feed <- forest.sim(g.mod.am = d$feedback.models$grow.mod.am, g.mod.em = d$feedba
                    m.mod.am = d$feedback.models$mort.mod.am, m.mod.em = d$feedback.models$mort.mod.em,
                    myco.split = 'between_plot',
                    env.cov = d$env.cov,
-                   n.cores = 8,
+                   n.cores = 28,
                    n.plots = 500, n.step = 40)
 cat('Feedback mdeols fit.\n')
 toc()
