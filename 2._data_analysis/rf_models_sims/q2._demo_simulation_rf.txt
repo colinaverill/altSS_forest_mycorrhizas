@@ -33,7 +33,7 @@
 module load R/3.6.0
 #
 ### Tell the computer to run the R script!
-Rscript 2._data_analysis/rf_model_sims/2._demo_simulation_rf.r
+Rscript 2._data_analysis/rf_models_sims/2._demo_simulation_rf.r
 #
 ### End of commands.
 #
