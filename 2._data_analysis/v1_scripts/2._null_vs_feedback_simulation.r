@@ -50,7 +50,7 @@ fed <-     forest.sim(g.mod    = fits$y.feedback$G.mod,
                       myco.split = 'between_plot',
                       disturb_rate = 0.0476/2,
                       n.plots = N.PLOTS,
-                      n.cores = n.cores)
+                      n.cores = n.cores, n.step = 70)
 cat('feedback simulations complete. \n')
 toc()
 

@@ -15,13 +15,13 @@ forest.sim <- function(g.mod.am, g.mod.em,
   if("doParallel" %in% (.packages()) == F){
     library(doParallel)
   }
-  #check if random forest is installed.
-  if('doParallel' %in% rownames(installed.packages()) == F){
-    stop('This function requires the randomForest package, please install it.\n')
+  #check if mgcv forest is installed.
+  if('mgcv' %in% rownames(installed.packages()) == F){
+    stop('This function requires the mgcv package, please install it.\n')
   }
   #If doParallel is not loaded, load it.
-  if("doParallel" %in% (.packages()) == F){
-    library(randomForest)
+  if("mgcv" %in% (.packages()) == F){
+    library(mgcv)
   }
   #Check if rowr is installed.
   if('rowr' %in% rownames(installed.packages()) == F){
@@ -106,12 +106,13 @@ forest.sim <- function(g.mod.am, g.mod.em,
     density <- nrow(sum)
     plot.basal <- sum(pi*(sum$DIA.cm/2)^2)
     plot.basal.em <- sum(pi*((sum$em*sum$DIA.cm)/2)^2)
+    plot.basal.am <- plot.basal - plot.basal.em
     em.density <- sum(sum$em)
     am.density <- length(sum$em) - sum(sum$em)
     relEM <- plot.basal.em / plot.basal
     STDAGE <- 0
-    return <- c(plot.basal, plot.basal.em, density, am.density, em.density, relEM, STDAGE)
-    names(return) <- c('BASAL.plot','BASAL.em','stem.density','am.density','em.density','relEM','STDAGE')
+    return <- c(plot.basal, plot.basal.em, plot.basal.am, density, am.density, em.density, relEM, STDAGE)
+    names(return) <- c('BASAL.plot','BASAL.em','BASAL.am','stem.density','am.density','em.density','relEM','STDAGE')
     #add the environmental covariates in (if you have any).
     if(sum(!is.na(env.cov)) > 0){
       #sample a row of the environmental covariate matrix.
@@ -139,6 +140,10 @@ forest.sim <- function(g.mod.am, g.mod.em,
         colnames(cov)[1] <- c('PREVDIA.cm')
         #merge plot-level covariates into tree table
         cov <- rowr::cbind.fill(cov, plot.table[j,])
+        
+        #ORDER TREE TABLE BY EM STATUS.
+        #So important otherwise you scramble em status later down.
+        cov <- cov[order(cov$em),]
         
         #grow your trees.
         tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,])
@@ -206,10 +211,11 @@ forest.sim <- function(g.mod.am, g.mod.em,
       am.density <- length(sum$em) - sum(sum$em)
       plot.basal <- sum(pi*(sum$DIA.cm/2)^2)
       plot.basal.em <- sum(pi*((sum$em*sum$DIA.cm)/2)^2)
+      plot.basal.am <- plot.basal - plot.basal.em
       relEM <- plot.basal.em / plot.basal
       STDAGE <- t*5
-      return <- c(plot.basal, plot.basal.em, density, am.density, em.density, relEM, STDAGE)
-      names(return) <- c('BASAL.plot','BASAL.em','stem.density','am.density','em.density','relEM','STDAGE')
+      return <- c(plot.basal, plot.basal.em, plot.basal.am, density, am.density, em.density, relEM, STDAGE)
+      names(return) <- c('BASAL.plot','BASAL.em','BASAL.am','stem.density','am.density','em.density','relEM','STDAGE')
       #add the static environmental covariates in (if you have any).
       if(sum(!is.na(env.cov)) > 0){
         this.env <- env.table[i,]

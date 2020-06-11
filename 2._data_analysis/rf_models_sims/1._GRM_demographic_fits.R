@@ -19,6 +19,8 @@ d2 <- data.table(readRDS(Product_2.subset.path))
 d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
 setnames(d1,'plot.BASAL','BASAL.plot')
 setnames(d2,'plot.BASAL','BASAL.plot')
+setnames(d1, 'BASAL.ECM','BASAL.em')
+setnames(d1, 'BASAL.AM' ,'BASAL.am')
 
 #organize & complete case data within AM-EM divisions.-----
 grow.dat.all <- d2[          ,.(DIA.cm,PREVDIA.cm,relEM,BASAL.plot,stem.density,ndep,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10)]
@@ -35,41 +37,54 @@ mort.dat.all <- mort.dat.all[complete.cases(mort.dat.all),]
 mort.dat.am  <- mort.dat.am [complete.cases(mort.dat.am ),]
 mort.dat.em  <- mort.dat.em [complete.cases(mort.dat.em ),]
 #recruitment data frames.
-recr.dat.all <- d1[,.(recruit.am,recruit.em,relEM,BASAL.plot,stem.density,ndep,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10)]
+recr.dat.all <- d1[,.(recruit.am,recruit.em,relEM,BASAL.plot,BASAL.am,BASAL.em,stem.density,ndep,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10)]
 recr.dat.all <- recr.dat.all[complete.cases(recr.dat.all),]
-recr.dat.am  <- recr.dat.all[,!"recruit.em"]
-recr.dat.em  <- recr.dat.all[,!"recruit.am"]
+recr.dat.am  <- recr.dat.all[,!c("recruit.em","BASAL.em")]
+recr.dat.em  <- recr.dat.all[,!c("recruit.am",'BASAL.am')]
 
-#Fit models.-----
+#Fit feedback models.-----
 #growth models.
 tic()
-grow.mod.am <- parallel_rf(DIA.cm ~ ., data = grow.dat.am)
-grow.mod.em <- parallel_rf(DIA.cm ~ ., data = grow.dat.em)
+grow.mod.am      <- parallel_rf(DIA.cm ~ ., data = grow.dat.am)
+grow.mod.am.null <- parallel_rf(DIA.cm ~ ., data = grow.dat.am[,!"relEM"])
+grow.mod.em      <- parallel_rf(DIA.cm ~ ., data = grow.dat.em)
+grow.mod.em.null <- parallel_rf(DIA.cm ~ ., data = grow.dat.em[,!"relEM"])
 cat('Growth models fit.\n')
 toc()
 
 #mortality models.
 tic()
-mort.mod.am <- parallel_rf(mortality ~ ., data = mort.dat.am)
-mort.mod.em <- parallel_rf(mortality ~ ., data = mort.dat.em)
+mort.mod.am      <- parallel_rf(mortality ~ ., data = mort.dat.am)
+mort.mod.am.null <- parallel_rf(mortality ~ ., data = mort.dat.am[,!"relEM"])
+mort.mod.em      <- parallel_rf(mortality ~ ., data = mort.dat.em)
+mort.mod.em.null <- parallel_rf(mortality ~ ., data = mort.dat.em[,!"relEM"])
 cat('Mortality models fit.\n')
 toc()
 
 #recuritment models.
 tic()
-recr.mod.am <- parallel_rf(recruit.am ~ ., data = recr.dat.am)
-recr.mod.em <- parallel_rf(recruit.em ~ ., data = recr.dat.em)
+recr.mod.am      <- parallel_rf(recruit.am ~ ., data = recr.dat.am)
+recr.mod.am.null <- parallel_rf(recruit.am ~ ., data = recr.dat.am[,!"relEM"])
+recr.mod.em      <- parallel_rf(recruit.em ~ ., data = recr.dat.em)
+recr.mod.em.null <- parallel_rf(recruit.em ~ ., data = recr.dat.em[,!"relEM"])
 cat('Recruitment models fit.\n')
 toc()
 
 #Wrap output and save.----
 #models.
-model.list <- list(grow.mod.am, grow.mod.em,
-                   mort.mod.am, mort.mod.em,
-                   recr.mod.am, recr.mod.em)
-names(model.list) <- c('grow.mod.am', 'grow.mod.em',
-                       'mort.mod.am', 'mort.mod.em',
-                       'recr.mod.am', 'recr.mod.em')
+feed.model.list <- list(grow.mod.am, grow.mod.em,
+                        mort.mod.am, mort.mod.em,
+                        recr.mod.am, recr.mod.em)
+null.model.list <- list(grow.mod.am.null, grow.mod.em.null,
+                        mort.mod.am.null, mort.mod.em.null,
+                        recr.mod.am.null, recr.mod.em.null)
+
+names(feed.model.list) <- c('grow.mod.am', 'grow.mod.em',
+                            'mort.mod.am', 'mort.mod.em',
+                            'recr.mod.am', 'recr.mod.em')
+names(null.model.list) <- c('grow.mod.am', 'grow.mod.em',
+                            'mort.mod.am', 'mort.mod.em',
+                            'recr.mod.am', 'recr.mod.em')
 #data.
  data.list <- list(grow.dat.all, grow.dat.am, grow.dat.em,
                    mort.dat.all, mort.dat.am, mort.dat.em,
@@ -81,8 +96,8 @@ names(data.list) <- c('grow.dat.all', 'grow.dat.am', 'grow.dat.em',
 env.cov <- recr.dat.all[,!c('recruit.am','recruit.em','relEM','stem.density','BASAL.plot')]
 
 #full output.
-output <- list(model.list, data.list,env.cov)
-names(output) <- c('models','data','env.cov')
+output <- list(feed.model.list,null.model.list, data.list,env.cov)
+names(output) <- c('feedback.models','null.models','data','env.cov')
 saveRDS(output, output.path)
 cat('Script complete.\n')
 

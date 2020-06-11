@@ -23,7 +23,6 @@ FIAdb.path <- paste0(FIA7.dir.path,'FIA7.sqlite')
 #Other raster data outside of main storage directory.----
 EPA_L2_ecoregions_raster.path <- '/Users/colinaverill/Documents/data_storage/misc_rasters/NA_level2_ecoregions/NA_CEC_Eco_Level2.shp'
 
-
 #other (small) database paths.----
 nodDB.path <- 'required_products_utilities/nodDB_v1.csv'
 
@@ -65,7 +64,8 @@ demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ec
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
            factorial_hysteresis_simulation.path <- paste0(model.dir,'factorial_hysteresis_simulation.rds')
    initial_condition_hysteresis_simulation.path <- paste0(model.dir,'initial_condition_hysteresis_simulation.rds')
-
+     RF_null_vs_feedback_simulation_output.path <- paste0(model.dir,'RF_null_vs_feedback_simulation_output.rds')
+   
 #Figure output paths.----
 fig.dir <- 'figures/'
 cmd <- paste0('mkdir -p ',fig.dir)

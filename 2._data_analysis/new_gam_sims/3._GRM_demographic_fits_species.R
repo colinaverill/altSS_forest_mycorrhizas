@@ -15,6 +15,13 @@ d2 <- data.table(readRDS(Product_2.subset.path))
 myc <- read.csv('required_products_utilities/mycorrhizal_SPCD_data.csv')
 gym <- read.csv('required_products_utilities/gymnosperm_family_genera.csv')
 
+#function to draw randomly from multivariate normal distribution.
+rmvn <- function(n,mu,sig) { ## MVN random deviates
+  L <- mroot(sig);m <- ncol(L);
+  t(mu + L%*%matrix(rnorm(m*n),m,n)) 
+}
+
+
 #Subset and rename some things.-----
 d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
 d2$PLT_CN <- as.factor(d2$PLT_CN)
@@ -66,9 +73,13 @@ for(i in 1:length(spp.name.lab)){
   recruits <- aggregate(recruit ~ PLT_CN, FUN = sum, data = d2.sub)
   d1.sub$recruit <- NULL
   d1.sub <- merge(d1.sub, recruits, by = 'PLT_CN')
+  basal.consp <- aggregate(BASAL ~ PLT_CN, FUN = sum, data=d2.sub[d2.sub$recruit == 0,])
+  colnames(basal.consp) <- c('PLT_CN','BASAL.consp')
+  d1.sub <- merge(d1.sub,basal.consp, all.x = T)
+  d1.sub$BASAL.consp <- ifelse(is.na(d1.sub$BASAL.consp), 0, d1.sub$BASAL.consp)
   
   #fit gam models.
-  R.mod <- gam(recruit    ~  s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk)+
+  R.mod <- gam(recruit    ~  s(relEM, k=kk) + s(BASAL.consp, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk)+
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k=kk), 
                   data = d1.sub, family = 'poisson')
   M.mod <- gam(mortality  ~  s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k = 5)+
@@ -80,7 +91,7 @@ for(i in 1:length(spp.name.lab)){
   
   #Grab plot environmental covariates for reference.
   #all plot-level environmental covariates. we will sample this later when simulating forests.
-  all.cov <- d1.sub[,c('BASAL.plot','stem.density','ndep','PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10')]
+  all.cov <- d1.sub[,c('BASAL.plot','BASAL.consp','stem.density','ndep','PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10')]
   #mean plot-level environmental covariates.
   cov <- colMeans(all.cov)
   cov <- c(mean(d2.sub$PREVDIA.cm, na.rm=T),cov)
@@ -91,9 +102,50 @@ for(i in 1:length(spp.name.lab)){
   m.pred <- predict(M.mod, newdata = pred.frame, se.fit = T)
   r.pred <- predict(R.mod, newdata = pred.frame, se.fit = T)
   
+  #get contrast by drawing from posterior.
+  newdat <- pred.frame[c(1, nrow(pred.frame)),]
+  #covert X predictors to match knots.
+  Xp.g <- predict(G.mod, newdata = newdat, type = 'lpmatrix')
+  Xp.m <- predict(M.mod, newdata = newdat, type = 'lpmatrix')
+  Xp.r <- predict(R.mod, newdata = newdat, type = 'lpmatrix')
+  
+  #Draw matrix of correlated predictors from posterior.
+  g.par <- rmvn(1000,coef(G.mod),G.mod$Vp)
+  m.par <- rmvn(1000,coef(M.mod),M.mod$Vp)
+  r.par <- rmvn(1000,coef(R.mod),R.mod$Vp)
+  
+  #Multiply predictors by each posterior draw of parameters.
+  g.pred <- list()
+  m.pred <- list()
+  r.pred <- list()
+  for(j in 1:1000){
+    g.pred[[j]] <- t(Xp.g %*% g.par[j,])
+    m.pred[[j]] <- t(Xp.m %*% m.par[j,])
+    r.pred[[j]] <- t(Xp.r %*% r.par[j,])
+  }
+  g.pred <- do.call(rbind, g.pred)
+  m.pred <- do.call(rbind, m.pred)
+  r.pred <- do.call(rbind, r.pred)
+  
+  #convert mortality to survival.
+  m.pred <- boot::logit(1 - boot::inv.logit(m.pred))
+  
+  #grab summary stats.
+  g.mu <-     mean(g.pred[,2] - g.pred[,1])
+  g.sd <-       sd(g.pred[,2] - g.pred[,1])
+  g.95 <- quantile(g.pred[,2] - g.pred[,1], probs = c(0.025, 0.975))
+  m.mu <-     mean(m.pred[,2] - m.pred[,1])
+  m.sd <-       sd(m.pred[,2] - m.pred[,1])
+  m.95 <- quantile(m.pred[,2] - m.pred[,1], probs = c(0.025, 0.975))
+  r.mu <- mean(r.pred[,2] - r.pred[,1])
+  r.sd <-   sd(r.pred[,2] - r.pred[,1])
+  r.95 <- quantile(r.pred[,2] - r.pred[,1], probs = c(0.025, 0.975))
+  post.contrast <- list(g.mu, g.sd, g.95, m.mu, m.sd, m.95, r.mu, r.sd, r.95)
+  names(post.contrast) <- c('g.mu','g.sd','g.95','m.mu','m.sd','m.95','r.mu','r.sd','r.95')
+  
   #store in list and report.
-  spp.out <- list(G.mod, M.mod, R.mod, g.pred, m.pred, r.pred, cov)
-  names(spp.out) <- c('G.mod','M.mod','R.mod','G.pred','M.pred','R.pred','cov')
+  spp.out <- list(G.mod, M.mod, R.mod, g.pred, m.pred, r.pred, cov,post.contrast)
+  names(spp.out) <- c('G.mod','M.mod','R.mod','G.pred','M.pred','R.pred','cov','post.contrast')
   output[[i]] <- spp.out
   msg <- paste0(spp.name.lab[i],' fit. ',i,' of ',length(spp.name.lab),' species fits complete.\n')
   cat(msg); toc()

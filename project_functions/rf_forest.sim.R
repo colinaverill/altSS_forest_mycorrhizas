@@ -140,6 +140,10 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #merge plot-level covariates into tree table
         cov <- rowr::cbind.fill(cov, plot.table[j,])
         
+        #ORDER TREE TABLE BY EM STATUS.
+        #So important otherwise you scramble em status later down.
+        cov <- cov[order(cov$em),]
+        
         #grow your trees.
         tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,])
         tree.new.em <- predict(g.mod.em, newdata = cov[cov$em == 1,])
