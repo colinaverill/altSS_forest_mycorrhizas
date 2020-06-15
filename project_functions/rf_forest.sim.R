@@ -211,6 +211,7 @@ forest.sim <- function(g.mod.am, g.mod.em,
       plot.basal <- sum(pi*(sum$DIA.cm/2)^2)
       plot.basal.em <- sum(pi*((sum$em*sum$DIA.cm)/2)^2)
       relEM <- plot.basal.em / plot.basal
+      if(is.nan(relEM)){relEM <- 0}
       STDAGE <- t*5
       return <- c(plot.basal, plot.basal.em, density, am.density, em.density, relEM, STDAGE)
       names(return) <- c('BASAL.plot','BASAL.em','stem.density','am.density','em.density','relEM','STDAGE')
