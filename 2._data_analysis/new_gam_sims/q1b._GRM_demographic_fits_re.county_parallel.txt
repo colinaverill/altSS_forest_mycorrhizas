@@ -10,7 +10,7 @@
 #$ -pe omp 28
 #
 ### Give the job a name
-#$ -N gam_re
+#$ -N county_re
 #
 ### Merge stderr into the stdout file, to reduce clutter
 #$ -j y
