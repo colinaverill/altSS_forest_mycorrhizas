@@ -58,8 +58,8 @@ rf_demographic_fits_interactive.path <- paste0(model.dir,'rf_demographic_fits_in
 demographic_fits_gam_separate.path <- paste0(model.dir,'demographic_fits_gam_separate.rds')
 demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ecoregion.rds')
   demographic_fits_gam_species.path <- paste0(model.dir,'demographic_fits_gam_species.rds')
-  demographic_fits_gam_separate_plus_re.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re.rds')
-
+  demographic_fits_gam_separate_plus_re_county.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_county.rds')
+  demographic_fits_gam_separate_plus_re_plot.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_plot.rds')
 #Demographic simulation output paths.
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
            factorial_hysteresis_simulation.path <- paste0(model.dir,'factorial_hysteresis_simulation.rds')

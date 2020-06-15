@@ -33,7 +33,7 @@
 module load R/3.6.0
 #
 ### Tell the computer to run the R script!
-Rscript 2._data_analysis/new_gam_sims/1b._GRM_demographic_fits_re_parallel.R
+Rscript 2._data_analysis/new_gam_sims/1b._GRM_demographic_fits_re.plot_parallel.R
 #
 ### End of commands.
 #
