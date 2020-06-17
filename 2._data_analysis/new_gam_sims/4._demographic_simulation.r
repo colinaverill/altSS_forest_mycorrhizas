@@ -4,7 +4,7 @@ source('paths.r')
 library(doParallel)
 library(randomForest)
 library(mgcv)
-source('project_functions/gam.int_forest.sim.R')
+source('project_functions/gam.int_forest.sim.r')
 source('project_functions/tic_toc.r')
 
 #set output path.----
@@ -20,7 +20,7 @@ null <- forest.sim(g.mod.am = d$n.feedback$G.mod.am, g.mod.em = d$n.feedback$G.m
                    m.mod.am = d$n.feedback$M.mod.am, m.mod.em = d$n.feedback$M.mod.em,
                    myco.split = 'between_plot',
                    env.cov = d$all.cov,
-                   n.cores = 8,
+                   n.cores = 28,
                    n.plots = 1000, n.step = 40)
 cat('Null simulation complete.\n')
 toc()
@@ -30,7 +30,7 @@ feed <- forest.sim(g.mod.am = d$y.feedback$G.mod.am, g.mod.em = d$y.feedback$G.m
                    m.mod.am = d$y.feedback$M.mod.am, m.mod.em = d$y.feedback$M.mod.em,
                    myco.split = 'between_plot',
                    env.cov = d$all.cov,
-                   n.cores = 8,
+                   n.cores = 28,
                    n.plots = 1000, n.step = 40)
 cat('Feedback simulation complete.\n')
 toc()
@@ -39,7 +39,6 @@ toc()
 out <- list(null,feed)
 names(out) <- c('n.feedback','y.feedback')
 saveRDS(out, output.path)
-
 
 
 #Diagnostics.----
