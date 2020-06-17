@@ -144,15 +144,16 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #ORDER TREE TABLE BY EM STATUS.
         #So important otherwise you scramble em status later down.
         cov <- cov[order(cov$em),]
+        cov$county.ID <- 0
         
         #grow your trees.
-        tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,])
-        tree.new.em <- predict(g.mod.em, newdata = cov[cov$em == 1,])
+        tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+        tree.new.em <- predict(g.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
         tree.new <- data.frame(c(tree.new.am, tree.new.em))
         
         #kill your trees.
-        tree.dead.am <- predict(m.mod.am, newdata = cov[cov$em == 0,])
-        tree.dead.em <- predict(m.mod.em, newdata = cov[cov$em == 1,])
+        tree.dead.am <- predict(m.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+        tree.dead.em <- predict(m.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
         tree.dead    <- c(tree.dead.am, tree.dead.em)
         tree.dead    <- rbinom(length(tree.dead), 1, boot::inv.logit(tree.dead))   #logit, since model fit on logit scale.
         tree.new     <- data.frame(tree.new[!(tree.dead == 1),])                   #drop trees that died from tree table.
