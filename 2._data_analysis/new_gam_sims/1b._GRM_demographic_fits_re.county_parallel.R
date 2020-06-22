@@ -35,10 +35,10 @@ bs <- 'cr' #thin plate regression splines too slow, and results are similar.
 #Fit growth, recruitment and mortality models.----
 #Environmental models without feedbacks.
 cat('Fitting null models...\n');tic()
-R.mod.em <- bam(recruit.em ~        + s(BASAL.em, k=kk, bs=bs) + s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+R.mod.em <- bam(recruit.em ~        s(BASAL.em, k=kk, bs=bs) + s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
                   s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k =kk, bs=bs), 
                 data = d1, family = 'poisson', cluster = cl)
-R.mod.am <- bam(recruit.am ~        + s(BASAL.am, k=kk, bs=bs) + s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+R.mod.am <- bam(recruit.am ~        s(BASAL.am, k=kk, bs=bs) + s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
                   s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k =kk, bs=bs), 
                 data = d1, family = 'poisson', cluster = cl)
 M.mod.em <- bam(mortality ~          s(ndep, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 

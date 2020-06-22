@@ -118,7 +118,7 @@ for(i in 1:length(ecoregion.ref)){
   
   total.out <- list(region.out, region.out.countyRE, region.out.plotRE)
   names(total.out) <- c('none.re','county.re','plot.re')
-  output[[i]] <- 
+  output[[i]] <- total.out
     msg <- paste0(ecoregion.ref[i],' fit. ',i,' of ',length(ecoregion.ref),' ecoregions complete.\n')
   cat(msg); toc()
 }
