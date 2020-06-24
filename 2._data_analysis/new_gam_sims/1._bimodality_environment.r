@@ -3,7 +3,12 @@ source('paths.r')
 source('project_functions/crib_fun.r')
 library(mgcv)
 library(boot)
+library(diptest)
 library(betareg)
+library(data.table)
+
+#set output path.----
+output.path <- bimodality_results.path
 
 #load and prepare data.-----
 d1 <- data.table(readRDS(Product_1.path))
@@ -24,8 +29,8 @@ m <- gam(logit(y) ~ s(ndep, k = kk) + s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk)
 
 #plot raw and detrended relative abundance data.----
 #grab mean covariates.
-all.cov <- d1[,c('ndep','PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10')]
-all.cov <- data.frame(t(colMeans(all.cov)))
+raw.cov <- d1[,c('ndep','PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9','PC10')]
+all.cov <- data.frame(t(colMeans(raw.cov)))
 
 par(mfrow = c(1,2))
 #raw data.
@@ -34,3 +39,15 @@ hist(d$y, breaks = 20, ylim = c(0,1300))
 mean.pred <- predict(m, newdata=all.cov)
 detrend <- logit(d$y) - fitted(m) + rep(mean.pred, length(d$y))
 hist(inv.logit(detrend), breaks = 20, ylim = c(0,1300))
+
+#hartigan's dip test.----
+raw.dip <- dip.test(d$y)
+detrend.dip <- dip.test(detrend)
+
+#Save output.----
+output <- cbind(d1$latitude.y, d1$longitude.y, d$y, detrend, raw.cov)
+colnames(output)[1:4] <- c('latitude','longitude','relEM','relEM.detrend')
+output$detrend <- inv.logit(output$relEM.detrend)
+output <- list(output,raw.dip,detrend.dip)
+names(output) <- c('data','raw.dip.test','detrend.dip.test')
+saveRDS(output, output.path)
