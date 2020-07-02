@@ -55,7 +55,7 @@ cat('Fitting feedback models...\n');tic()
   R.mod.em <- gam(recruit.em ~  s(relEM, k = kk) + s(BASAL.em, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
                     s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
                   data = d1, family = 'poisson', method = 'REML')
-  R.mod.am <- gam(recruit.am ~  s(relEM, k = kk) + s(BASAL.em, k = kk)  + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
+  R.mod.am <- gam(recruit.am ~  s(relEM, k = kk) + s(BASAL.am, k = kk)  + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
                   data = d1, family = 'poisson', method = 'REML')
   M.mod.em <- gam(mortality  ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
