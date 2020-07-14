@@ -9,6 +9,9 @@ source('project_functions/tic_toc.r')
 #set output path.----
 output.path <- demographic_fits_gam_species.path
 
+#parallel environment.-----
+cl <- makeCluster(28)
+
 #load growth/mortality/recruitment data.----
 d1 <- data.table(readRDS(Product_1.path))
 d2 <- data.table(readRDS(Product_2.subset.path))
@@ -86,15 +89,15 @@ for(i in 1:length(spp.name.lab)){
   R.mod <- bam(recruit    ~  s(relEM, k=kk, bs=bs) + s(BASAL.consp, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, family = 'poisson')
+                  data = d1.sub, cluster=cl, family = 'poisson')
   M.mod <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub, family = 'binomial')
+                  data = d2.sub, cluster=cl, family = 'binomial')
   G.mod <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, kk=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub)
+                  data = d2.sub, cluster=cl)
   
   #Grab plot environmental covariates for reference.
   #all plot-level environmental covariates. we will sample this later when simulating forests.
