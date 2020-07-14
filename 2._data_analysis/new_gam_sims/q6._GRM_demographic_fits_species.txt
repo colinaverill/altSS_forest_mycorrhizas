@@ -68,7 +68,7 @@ Rscript 2._data_analysis/new_gam_sims/#!/bin/bash -l
 module load R/3.6.0
 #
 ### Tell the computer to run the R script!
-Rscript 2._data_analysis/new_gam_sims/3._GRM_demographic_fits_species.R
+Rscript 2._data_analysis/new_gam_sims/6._GRM_demographic_fits_species.R
 #
 ### End of commands.
 #

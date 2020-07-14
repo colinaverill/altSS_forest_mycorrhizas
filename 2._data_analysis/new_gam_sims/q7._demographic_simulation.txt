@@ -33,7 +33,7 @@
 module load R/3.6.0
 #
 ### Tell the computer to run the R script!
-Rscript 2._data_analysis/new_gam_sims/4._demographic_simulation.r
+Rscript 2._data_analysis/new_gam_sims/7._demographic_simulation.r
 #
 ### End of commands.
 #

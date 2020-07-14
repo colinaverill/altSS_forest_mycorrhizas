@@ -10,7 +10,7 @@
 #$ -pe omp 28
 #
 ### Give the job a name
-#$ -N ecoregion_fits
+#$ -N county_re
 #
 ### Merge stderr into the stdout file, to reduce clutter
 #$ -j y
@@ -33,7 +33,7 @@
 module load R/3.6.0
 #
 ### Tell the computer to run the R script!
-Rscript 2._data_analysis/new_gam_sims/2._GRM_demographic_fits_ecoregion.R
+Rscript 2._data_analysis/new_gam_sims/3._GRM_demographic_fits_county.RE.R
 #
 ### End of commands.
 #
