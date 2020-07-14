@@ -37,8 +37,9 @@ all.past2.path   <- paste0(fia.dir,'FIA.all.past2.rds')
 all.past3.path   <- paste0(fia.dir,'FIA.all.past3.rds')
 
 #paths for grabbing and returning lab composite environmental data.----
- data_for_composite.path <- paste0(storage.dir, 'data_for_composite_CA.csv')
-data_from_composite.path <- paste0(storage.dir,'data_from_composite_CA.csv')
+      data_for_composite.path <- paste0(storage.dir, 'data_for_composite_CA.csv')
+     data_from_composite.path <- paste0(storage.dir,'data_from_composite_CA.csv')
+composite_variable_names.path <- paste0(storage.dir,'composite_varaible_names.csv')
 
 #FIA formatted analysis products.----
 Product_1.path         <- paste0(fia.dir,"Product_1.rds")

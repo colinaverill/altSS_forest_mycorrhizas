@@ -29,7 +29,10 @@ setnames(d1,'plot.BASAL','BASAL.plot')
 setnames(d2,'plot.BASAL','BASAL.plot')
 d1$PLT_CN <- as.character(d1$PLT_CN)
 d2$PLT_CN <- as.character(d2$PLT_CN)
-
+d1$county.ID <- paste0(d1$STATECD,'_',d1$COUNTYCD)
+d2$county.ID <- paste0(d2$STATECD,'_',d1$COUNTYCD)
+d1$county.ID <- as.factor(d1$county.ID)
+d2$county.ID <- as.factor(d2$county.ID)
 
 #Get 10 most abundant AM and EM tree species.----
 check <- aggregate(DIA.cm ~ SPCD, FUN = length, data = d2)
@@ -37,11 +40,11 @@ colnames(check)[2] <- 'count'
 #merge in names, gymno and AM-EM.
 check <- merge(check,myc[,c('SPCD','MYCO_ASSO','GENUS','SPECIES')], all.x = T)
 check$gymno <- ifelse(check$GENUS %in% gym$genus, 1, 0)
-check <- check[!(check$GENUS == 'Ulmus'),] #drop elms (dutch elm disease)
+#check <- check[!(check$GENUS == 'Ulmus'),] #drop elms (dutch elm disease)
 check <- check[order(check$count, decreasing = T),]
 top.em <- check[check$MYCO_ASSO == 'ECM',]
 top.am <- check[check$MYCO_ASSO == 'AM' ,]
-n.spp <- 10 #number of species to grab of AM and EM functional types. Will be cut if not 1k plots present.
+n.spp <- 11 #number of species to grab of AM and EM functional types. Will be cut if not 1k plots present.
 top.em <- top.em[1:n.spp,]
 top.am <- top.am[1:n.spp,]
 top.20 <- rbind(top.am, top.em)
@@ -60,6 +63,7 @@ cat(paste0('These species represent ',em.rel,'% of all EM basal area and ',am.re
 
 #Set global k for gam fits.----
 kk <- 5
+bs <- 'cr'
 
 #Fit growth, recruitment and mortality models by species.----
 output <- list()
@@ -79,14 +83,17 @@ for(i in 1:length(spp.name.lab)){
   d1.sub$BASAL.consp <- ifelse(is.na(d1.sub$BASAL.consp), 0, d1.sub$BASAL.consp)
   
   #fit gam models.
-  R.mod <- gam(recruit    ~  s(relEM, k=kk) + s(BASAL.consp, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk)+
-                    s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k=kk), 
+  R.mod <- bam(recruit    ~  s(relEM, k=kk, bs=bs) + s(BASAL.consp, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs)+
+                 s(county.ID, bs = 're') + 
+                 s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
                   data = d1.sub, family = 'poisson')
-  M.mod <- gam(mortality  ~  s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k = 5)+
-                    s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k=kk), 
+  M.mod <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs)+
+                 s(county.ID, bs = 're') + 
+                 s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
                   data = d2.sub, family = 'binomial')
-  G.mod <- gam(DIA.cm   ~  s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k = 5)+
-                    s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k=kk), 
+  G.mod <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, kk=kk, bs=bs)+
+                 s(county.ID, bs = 're') + 
+                 s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
                   data = d2.sub)
   
   #Grab plot environmental covariates for reference.
@@ -98,16 +105,16 @@ for(i in 1:length(spp.name.lab)){
   names(cov)[1] <- 'PREVDIA.cm'
   pred.frame <- data.frame(seq(0 ,1 ,by = 0.01), t(cov))
   colnames(pred.frame)[1] <- 'relEM'
-  g.pred <- predict(G.mod, newdata = pred.frame, se.fit = T)
-  m.pred <- predict(M.mod, newdata = pred.frame, se.fit = T)
-  r.pred <- predict(R.mod, newdata = pred.frame, se.fit = T)
+  g.pred <- predict(G.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+  m.pred <- predict(M.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+  r.pred <- predict(R.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
   
   #get contrast by drawing from posterior.
   newdat <- pred.frame[c(1, nrow(pred.frame)),]
   #covert X predictors to match knots.
-  Xp.g <- predict(G.mod, newdata = newdat, type = 'lpmatrix')
-  Xp.m <- predict(M.mod, newdata = newdat, type = 'lpmatrix')
-  Xp.r <- predict(R.mod, newdata = newdat, type = 'lpmatrix')
+  Xp.g <- predict(G.mod, newdata = newdat, type = 'lpmatrix', exclude = c("s(county.ID)"), newdata.guaranteed = T)
+  Xp.m <- predict(M.mod, newdata = newdat, type = 'lpmatrix', exclude = c("s(county.ID)"), newdata.guaranteed = T)
+  Xp.r <- predict(R.mod, newdata = newdat, type = 'lpmatrix', exclude = c("s(county.ID)"), newdata.guaranteed = T)
   
   #Draw matrix of correlated predictors from posterior.
   g.par <- rmvn(1000,coef(G.mod),G.mod$Vp)

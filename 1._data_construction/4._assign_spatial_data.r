@@ -58,6 +58,9 @@ composite <- composite[complete.cases(composite),]
 plot.ref   <- composite[,.(PLT_CN,Pixel_Lat,Pixel_Long)]
 colnames(plot.ref) <- c('PLT_CN','latitude','longitude')
 composite  <- composite[,c('PLT_CN','Pixel_Lat','Pixel_Long') := NULL]
+#store column names for later.
+comp.varnames <- colnames(composite)
+
 
 #run PCA on full composite. Takes ~20s.-----
 tic()
@@ -92,3 +95,4 @@ p1 <- merge(p1, output, all.x = T, by = 'PLT_CN')
 p2 <- merge(p2, output, all.x = T, by = 'PLT_CN')
 saveRDS(p1, Product_1.path)
 saveRDS(p2, Product_2.path)
+write.csv(comp.varnames, composite_variable_names.path)
