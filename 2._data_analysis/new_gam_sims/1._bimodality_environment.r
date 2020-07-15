@@ -25,10 +25,11 @@ d$y <- crib_fun(d$y)
 #d$y <- ifelse(d$y == 1, max(d[d$y<1,]$y), d$y)
 
 #Fit gam to cribari-transformed, then logit transformed data.----
-kk <- 5
-m <- gam(logit(y) ~ s(ndep, k = kk) + s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk) +
-           s(county.id, bs='re'),
-         data = d, method = 'REML')
+kk <- 5 #number of spline knots.
+nt <- 8 #number of threads on machine.
+m <- bam(logit(y) ~ s(ndep, k=kk) + s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk)
+        # + s(county.id, bs='re')
+         , data = d, nthreads=nt, discrete=T)
 
 #plot raw and detrended relative abundance data.----
 #grab mean covariates.

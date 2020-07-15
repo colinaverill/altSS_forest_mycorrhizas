@@ -25,34 +25,32 @@ d2$PLT_CN <- as.factor(d2$PLT_CN)
 d2$county.ID <- as.factor(paste0(d2$STATECD,'_',d2$COUNTYCD))
 d1$county.ID <- as.factor(paste0(d1$STATECD,'_',d1$COUNTYCD))
 
-#parallel environment.-----
-cl <- makeCluster(28)
-
 #Set global k.----
-kk <- 5
-bs <- 'cr' #thin plate regression splines too slow, and results are similar.
+kk <- 5    #global max number of 'knots' to use in smoothing functions.
+bs <- 'tp' #thin plate regression splines are default as well, but you can change things here if you like.
+nt <- 8    #number of threads.
 
 #Fit growth, recruitment and mortality models.----
 #Environmental models without feedbacks.
 cat('Fitting null models...\n');tic()
-R.mod.em <- bam(recruit.em ~        s(BASAL.em, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+R.mod.em <- bam(recruit.em ~        s(BASAL.em, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                   s(county.ID, bs = 're'),
-                data = d1, family = 'poisson', cluster = cl)
-R.mod.am <- bam(recruit.am ~        s(BASAL.am, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+R.mod.am <- bam(recruit.am ~        s(BASAL.am, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                   s(county.ID, bs = 're'),
-                data = d1, family = 'poisson', cluster = cl)
-M.mod.em <- bam(mortality ~          s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+M.mod.em <- bam(mortality ~          s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 1,], family = 'binomial',  cluster = cl)
-M.mod.am <- bam(mortality ~          s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
+M.mod.am <- bam(mortality ~          s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 0,], family = 'binomial', cluster = cl)
-G.mod.em <- bam(DIA.cm   ~          s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
+G.mod.em <- bam(DIA.cm   ~            s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 1,], cluster = cl)
-G.mod.am <- bam(DIA.cm   ~          s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 1,], nthreads=nt, discrete=T)
+G.mod.am <- bam(DIA.cm   ~            s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 0,], cluster = cl)
+                data = d2[d2$em == 0,], nthreads=nt, discrete=T)
 cat('Null models fit.\n');toc()
 #wrap output and name.
 n.feedback <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em)
@@ -61,27 +59,25 @@ names(n.feedback) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R
 #Environmental models with feedbacks.
 #gam models.
 cat('Fitting feedback models...\n');tic()
-R.mod.em <- bam(recruit.em ~  s(relEM, k=kk, bs=bs) + s(BASAL.em, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+R.mod.em <- bam(recruit.em ~ s(relEM, k=kk, bs=bs) + s(BASAL.em, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                   s(county.ID, bs = 're'),
-                data = d1, family = 'poisson', cluster = cl)
-R.mod.am <- bam(recruit.am ~  s(relEM, k=kk, bs=bs) + s(BASAL.am, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+R.mod.am <- bam(recruit.am ~ s(relEM, k=kk, bs=bs) + s(BASAL.am, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                   s(county.ID, bs = 're'),
-                data = d1, family = 'poisson', cluster = cl)
-M.mod.em <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+M.mod.em <- bam(mortality ~ s(relEM, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 1,], family = 'binomial',  cluster = cl)
-M.mod.am <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
+M.mod.am <- bam(mortality ~ s(relEM, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 0,], family = 'binomial',  cluster = cl)
-G.mod.em <- bam(DIA.cm   ~ s(relEM, k=kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
+G.mod.em <- bam(DIA.cm   ~ s(relEM, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 1,],  cluster = cl)
-G.mod.am <- bam(DIA.cm   ~  s(relEM, k = kk, bs=bs) + s(BASAL.plot, k = kk, bs=bs) + s(stem.density, k = kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
+                data = d2[d2$em == 1,], nthreads=nt, discrete=T)
+G.mod.am <- bam(DIA.cm   ~ s(relEM, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) + 
                   s(county.ID, bs = 're'),
-                data = d2[d2$em == 0,],  cluster = cl)
+                data = d2[d2$em == 0,], nthreads=nt, discrete=T)
 cat('Feedback models fit.\n');toc()
-
-
 
 #wrap output and name.
 y.feedback <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em)

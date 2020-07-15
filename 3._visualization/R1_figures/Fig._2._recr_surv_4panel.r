@@ -78,72 +78,19 @@ y.em.recr <- exp(c(y.am.em, y.em.em))
 d <- readRDS(demographic_fits_gam_species.path)
 spp.key <- d$spp.key
 d$spp.key <- NULL
-
-#draw from species-level posteriors.----
-spp.result <- list()
-for(k in 1:length(d)){
-  spp <- d[[k]]
-  g.mod <- spp$G.mod
-  m.mod <- spp$M.mod
-  r.mod <- spp$R.mod
-  cov.am <- c(0,d[[k]]$cov)
-  cov.em <- c(1,d[[k]]$cov)
-  newdat <- data.frame(rbind(cov.am, cov.em))
-  colnames(newdat)[1] <- 'relEM'
-  
-  #covert X predictors to match knots.
-  Xp.g <- predict(g.mod, newdata = newdat, type = 'lpmatrix')
-  Xp.m <- predict(m.mod, newdata = newdat, type = 'lpmatrix')
-  Xp.r <- predict(r.mod, newdata = newdat, type = 'lpmatrix')
-  
-  #Draw matrix of correlated predictors from posterior.
-  g.par <- rmvn(1000,coef(g.mod),g.mod$Vp)
-  m.par <- rmvn(1000,coef(m.mod),m.mod$Vp)
-  r.par <- rmvn(1000,coef(r.mod),r.mod$Vp)
-  #Multiply predictors by each posterior draw of parameters.
-  g.pred <- list()
-  m.pred <- list()
-  r.pred <- list()
-  for(i in 1:1000){
-    g.pred[[i]] <- t(Xp.g %*% g.par[i,])
-    m.pred[[i]] <- t(Xp.m %*% m.par[i,])
-    r.pred[[i]] <- t(Xp.r %*% r.par[i,])
-  }
-  g.pred <- do.call(rbind, g.pred)
-  m.pred <- do.call(rbind, m.pred)
-  r.pred <- do.call(rbind, r.pred)
-  #convert mortality to survival.
-  m.pred <- boot::logit(1 - boot::inv.logit(m.pred))
-  
-  g.mu <-     mean(g.pred[,2] - g.pred[,1])
-  g.sd <-       sd(g.pred[,2] - g.pred[,1])
-  g.95 <- quantile(g.pred[,2] - g.pred[,1], probs = c(0.025, 0.975))
-  m.mu <-     mean(m.pred[,2] - m.pred[,1])
-  m.sd <-       sd(m.pred[,2] - m.pred[,1])
-  m.95 <- quantile(m.pred[,2] - m.pred[,1], probs = c(0.025, 0.975))
-  r.mu <- mean(r.pred[,2] - r.pred[,1])
-  r.sd <-   sd(r.pred[,2] - r.pred[,1])
-  r.95 <- quantile(r.pred[,2] - r.pred[,1], probs = c(0.025, 0.975))
-  out <- list(g.mu, g.sd, g.95, m.mu, m.sd, m.95, r.mu, r.sd, r.95)
-  names(out) <- c('g.mu','g.sd','g.95','m.mu','m.sd','m.95','r.mu','r.sd','r.95')
-  spp.result[[k]] <- out
-}
-names(spp.result) <- names(d)
-
-#Organize species level data for recruitment and survival plots.----
-g.mu <- rep(0, length(spp.result))
-g.sd <- rep(0, length(spp.result))
-r.mu <- rep(0, length(spp.result))
-r.sd <- rep(0, length(spp.result))
-m.mu <- rep(0, length(spp.result))
-m.sd <- rep(0, length(spp.result))
-for(i in 1:length(spp.result)){
-  g.mu[i] <- spp.result[[i]]$g.mu
-  g.sd[i] <- spp.result[[i]]$g.sd
-  m.mu[i] <- spp.result[[i]]$m.mu
-  m.sd[i] <- spp.result[[i]]$m.sd
-  r.mu[i] <- spp.result[[i]]$r.mu
-  r.sd[i] <- spp.result[[i]]$r.sd
+g.mu <- rep(0, length(d))
+g.sd <- rep(0, length(d))
+r.mu <- rep(0, length(d))
+r.sd <- rep(0, length(d))
+m.mu <- rep(0, length(d))
+m.sd <- rep(0, length(d))
+for(i in 1:length(d)){
+  g.mu[i] <- d[[i]]$post.contrast$g.mu
+  g.sd[i] <- d[[i]]$post.contrast$g.sd
+  m.mu[i] <- d[[i]]$post.contrast$m.mu
+  m.sd[i] <- d[[i]]$post.contrast$m.sd
+  r.mu[i] <- d[[i]]$post.contrast$r.mu
+  r.sd[i] <- d[[i]]$post.contrast$r.sd
 }
 spp.key$g.mu <- g.mu
 spp.key$g.sd <- g.sd

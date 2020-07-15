@@ -21,30 +21,31 @@ setnames(d2,'plot.BASAL','BASAL.plot')
 setnames(d1, 'BASAL.ECM','BASAL.em')
 setnames(d1, 'BASAL.AM' ,'BASAL.am' )
 
-#Set global k.----
+#Set global k (spline knots) and number of cores.----
 kk <- 5
+nt <- 8 #number of therads on machine.
 
 #Fit growth, recruitment and mortality models.----
 #Environmental models without feedbacks.
 cat('Fitting null models...\n');tic()
-R.mod.em <- gam(recruit.em ~        s(BASAL.em, k = kk)  + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
+R.mod.em <- bam(recruit.em ~        s(BASAL.em, k=kk)  + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d1, family = 'poisson', method = 'REML')
-R.mod.am <- gam(recruit.am ~        s(BASAL.am, k = kk)  + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+R.mod.am <- bam(recruit.am ~        s(BASAL.am, k=kk)  + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d1, family = 'poisson', method = 'REML')
-M.mod.em <- gam(mortality ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+M.mod.em <- bam(mortality ~          s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 1,], family = 'binomial', method = 'REML')
-M.mod.am <- gam(mortality ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d2[d2$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
+M.mod.am <- bam(mortality ~          s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 0,], family = 'binomial', method = 'REML')
-G.mod.em <- gam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d2[d2$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
+G.mod.em <- bam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 1,], method = 'REML')
-G.mod.am <- gam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d2[d2$em == 1,], nthreads=nt, discrete=T)
+G.mod.am <- bam(DIA.cm   ~          s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                data = d2[d2$em == 0,], method = 'REML')
+                data = d2[d2$em == 0,], nthreads=nt, discrete=T)
 cat('Null models fit.\n');toc()
 #wrap output and name.
 n.feedback <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em)
@@ -52,25 +53,25 @@ names(n.feedback) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R
 
 #Environmental models with feedbacks.
 cat('Fitting feedback models...\n');tic()
-  R.mod.em <- gam(recruit.em ~  s(relEM, k = kk) + s(BASAL.em, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
-                    s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d1, family = 'poisson', method = 'REML')
-  R.mod.am <- gam(recruit.am ~  s(relEM, k = kk) + s(BASAL.am, k = kk)  + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) +
+R.mod.em <- bam(recruit.em ~ s(relEM, k=kk) + s(BASAL.em, k=kk)  + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d1, family = 'poisson', method = 'REML')
-  M.mod.em <- gam(mortality  ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+R.mod.am <- bam(recruit.am ~ s(relEM, k=kk) + s(BASAL.am, k=kk)  + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 1,], family = 'binomial', method = 'REML')
-  M.mod.am <- gam(mortality  ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d1, family = 'poisson', nthreads=nt, discrete=T)
+M.mod.em <- bam(mortality ~ s(relEM, k=kk) + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 0,], family = 'binomial', method = 'REML')
-  G.mod.em <- gam(DIA.cm   ~  s(relEM, k = kk) +  s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d2[d2$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
+M.mod.am <- bam(mortality ~ s(relEM, k=kk) + s(ndep, k=kk) + s(BASAL.plot, k=kk) + s(stem.density, k=kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 1,], method = 'REML')
-  G.mod.am <- gam(DIA.cm   ~  s(relEM, k = kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                data = d2[d2$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
+G.mod.em <- bam(DIA.cm   ~ s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
                   s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
-                  data = d2[d2$em == 0,], method = 'REML')
-  cat('Feedback models fit.\n');toc()
+                data = d2[d2$em == 1,], nthreads=nt, discrete=T)
+G.mod.am <- bam(DIA.cm   ~ s(relEM, k=kk) + s(ndep, k = kk) + s(BASAL.plot, k = kk) + s(stem.density, k = kk) + s(PREVDIA.cm, k=kk) +
+                  s(PC1, k=kk) + s(PC2, k=kk) + s(PC3, k=kk) + s(PC4, k=kk) + s(PC5, k=kk) + s(PC6, k=kk) + s(PC7, k=kk) + s(PC8, k=kk) + s(PC9, k=kk) + s(PC10, k =kk), 
+                data = d2[d2$em == 0,], nthreads=nt, discrete=T)
+cat('Feedback models fit.\n');toc()
 
 
 #wrap output and name.
@@ -90,7 +91,7 @@ names(output) <- c('n.feedback', 'y.feedback','env.cov','all.cov')
 saveRDS(output, output.path, version = 2)
 
 #plot check.
-new.dat <- data.frame(22,14151,27)
+new.dat <- data.frame(mean(d2$PREVDIA.cm, na.rm=T), mean(d1$BASAL.plot),mean(d1$BASAL.am),mean(d1$BASAL.em),mean(d1$stem.density))
 colnames(new.dat) <- c('PREVDIA.cm','BASAL.plot','BASAL.em','BASAL.am','stem.density')
 new.dat <- cbind(new.dat, data.frame(t(cov)))
 new.dat <- data.frame(seq(0,1,by =0.01), new.dat)

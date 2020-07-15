@@ -27,12 +27,10 @@ setnames(d1,'BASAL.AM' ,'BASAL.am')
 ecoregion.ref <- table(d1$ecoregion)
 ecoregion.ref <- names(ecoregion.ref[ecoregion.ref > 1000])
 
-#parallel environment.-----
-cl <- makeCluster(28)
-
 #set k and basis for spline.----
-kk <- 5
-bs <- 'cr' #thin plate regression splines too slow, and results are similar.
+kk <- 5    #number of knots in smooth functions.
+bs <- 'tp' #thin plate regression are default, but you can change this here.
+nt <- 8    #number of cores to use while fitting.
 
 #Fit growth, recruitment and mortality models by ecoregion.----
 output <- list()
@@ -45,22 +43,22 @@ for(i in 1:length(ecoregion.ref)){
   #fit gam models - no random effect.
   R.mod.em <- bam(recruit.em ~  s(relEM, k=kk, bs=bs) + s(BASAL.em, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, family = 'poisson')
+                  data = d1.sub, family = 'poisson', nthreads=nt, discrete=T)
   R.mod.am <- bam(recruit.am ~  s(relEM, k=kk, bs=bs) + s(BASAL.am, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, family = 'poisson')
+                  data = d1.sub, family = 'poisson', nthreads=nt, discrete=T)
   M.mod.em <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
   M.mod.am <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
   G.mod.em <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) +  s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], nthreads=nt, discrete=T)
   G.mod.am <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], nthreads=nt, discrete=T)
   
   #Grab plot environmental covariates for reference.
   #all plot-level environmental covariates. we will sample this later when simulating forests.
@@ -78,27 +76,27 @@ for(i in 1:length(ecoregion.ref)){
   R.mod.em <- bam(recruit.em ~  s(relEM, k=kk, bs=bs) + s(BASAL.em, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, family = 'poisson')
+                  data = d1.sub, family = 'poisson', nthreads=nt, discrete=T)
   R.mod.am <- bam(recruit.am ~  s(relEM, k=kk, bs=bs) + s(BASAL.am, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, family = 'poisson')
+                  data = d1.sub, family = 'poisson', nthreads=nt, discrete=T)
   M.mod.em <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
   M.mod.am <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
   G.mod.em <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) +  s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], nthreads=nt, discrete=T)
   G.mod.am <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(county.ID, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], nthreads=nt, discrete=T)
   
   region.out.countyRE <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em, all.cov, cov)
   names(region.out.countyRE) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R.mod.em','all.cov','mean.cov')
@@ -107,25 +105,27 @@ for(i in 1:length(ecoregion.ref)){
   M.mod.em <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PLT_CN, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], family = 'binomial', nthreads=nt, discrete=T)
   M.mod.am <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PLT_CN, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], family = 'binomial', nthreads=nt, discrete=T)
   G.mod.em <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) +  s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PLT_CN, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 1,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 1,], nthreads=nt, discrete=T)
   G.mod.am <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs) +
                     s(PLT_CN, bs = 're') + 
                     s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub[d2.sub$em == 0,], cluster = cl)
+                  data = d2.sub[d2.sub$em == 0,], nthreads=nt, discrete=T)
   
   region.out.plotRE <- list(G.mod.am, G.mod.em, M.mod.am, M.mod.em, R.mod.am, R.mod.em, cov)
   names(region.out.plotRE) <- c('G.mod.am','G.mod.em','M.mod.am','M.mod.em','R.mod.am','R.mod.em','cov')
   
   total.out <- list(region.out, region.out.countyRE, region.out.plotRE)
   names(total.out) <- c('none.re','county.re','plot.re')
+  #total.out <- list(region.out, region.out.countyRE)
+  #names(total.out) <- c('none.re','county.re')
   output[[i]] <- total.out
     msg <- paste0(ecoregion.ref[i],' fit. ',i,' of ',length(ecoregion.ref),' ecoregions complete.\n')
   cat(msg); toc()

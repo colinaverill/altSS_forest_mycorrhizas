@@ -9,9 +9,6 @@ source('project_functions/tic_toc.r')
 #set output path.----
 output.path <- demographic_fits_gam_species.path
 
-#parallel environment.-----
-cl <- makeCluster(28)
-
 #load growth/mortality/recruitment data.----
 d1 <- data.table(readRDS(Product_1.path))
 d2 <- data.table(readRDS(Product_2.subset.path))
@@ -65,8 +62,9 @@ am.rel <- round((am10.basal/am.basal)*100, 2)
 cat(paste0('These species represent ',em.rel,'% of all EM basal area and ',am.rel,'% of all AM basal area.\n'))  
 
 #Set global k for gam fits.----
-kk <- 5
-bs <- 'cr'
+kk <- 5    #number of 'knots' smooths use while fitting.
+bs <- 'tp' #deafult in thin plate regression smooths, but you can change this here if you like.
+nt <- 8    #number of cores used.
 
 #Fit growth, recruitment and mortality models by species.----
 output <- list()
@@ -89,15 +87,15 @@ for(i in 1:length(spp.name.lab)){
   R.mod <- bam(recruit    ~  s(relEM, k=kk, bs=bs) + s(BASAL.consp, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d1.sub, cluster=cl, family = 'poisson')
+                  data = d1.sub, family = 'poisson' , nthreads=nt, discrete=T)
   M.mod <- bam(mortality  ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub, cluster=cl, family = 'binomial')
-  G.mod <- bam(DIA.cm   ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, kk=kk, bs=bs)+
+                  data = d2.sub, family = 'binomial', nthreads=nt, discrete=T)
+  G.mod <- bam(DIA.cm     ~  s(relEM, k=kk, bs=bs) + s(ndep, k=kk, bs=bs) + s(BASAL.plot, k=kk, bs=bs) + s(stem.density, k=kk, bs=bs) + s(PREVDIA.cm, k=kk, bs=bs)+
                  s(county.ID, bs = 're') + 
                  s(PC1, k=kk, bs=bs) + s(PC2, k=kk, bs=bs) + s(PC3, k=kk, bs=bs) + s(PC4, k=kk, bs=bs) + s(PC5, k=kk, bs=bs) + s(PC6, k=kk, bs=bs) + s(PC7, k=kk, bs=bs) + s(PC8, k=kk, bs=bs) + s(PC9, k=kk, bs=bs) + s(PC10, k=kk, bs=bs), 
-                  data = d2.sub, cluster=cl)
+                  data = d2.sub,                      nthreads=nt, discrete=T)
   
   #Grab plot environmental covariates for reference.
   #all plot-level environmental covariates. we will sample this later when simulating forests.
@@ -108,6 +106,13 @@ for(i in 1:length(spp.name.lab)){
   names(cov)[1] <- 'PREVDIA.cm'
   pred.frame <- data.frame(seq(0 ,1 ,by = 0.01), t(cov))
   colnames(pred.frame)[1] <- 'relEM'
+  #must add a level of the random effect, which will be ignored, for code to run (bug in mgcv when fitting using discrete method.)
+  #Must make sure the county.ID is in both datasets.
+  check1 <- G.mod$model$county.ID
+  check2 <- R.mod$model$county.ID
+  check2 <- check2[check2 %in% check1]
+  pred.frame$county.ID <- check2[1]
+  
   g.pred <- predict(G.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
   m.pred <- predict(M.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
   r.pred <- predict(R.mod, newdata = pred.frame, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
@@ -167,67 +172,3 @@ output$spp.key <- top.20
 saveRDS(output, output.path, version = 2)
 cat('Output saved, script complete.\n')
 
-#Plotting all as panels.----
-plotting <- F
-if(plotting == T){
-  #Plot recruitment models.
-  par(mfrow = c(4,5))
-  N <- nrow(top.20)
-  for(i in 1:N){
-    new.dat <- data.frame(seq(0 ,1 ,by = 0.01), t(output[[i]]$cov))
-    colnames(new.dat)[1] <- 'relEM'
-    pred.r <- predict(output[[i]]$R.mod, newdata = new.dat)
-    plot(pred.r ~ new.dat$relEM, bty = 'l', ylim = c(min(c(pred.r,pred.r)), max(c(pred.r,pred.r))), main = spp.name.lab[i])
-  }
-  
-  #Plot mortality models.
-  par(mfrow = c(4,5))
-  for(i in 1:N){
-    new.dat <- data.frame(seq(0 ,1 ,by = 0.01), t(output[[i]]$cov))
-    colnames(new.dat)[1] <- 'relEM'
-    pred.m <- predict(output[[i]]$M.mod, newdata = new.dat)
-    plot(pred.m ~ new.dat$relEM, bty = 'l', ylim = c(min(c(pred.m,pred.m)), max(c(pred.m,pred.m))), main = spp.name.lab[i])
-  }
-  
-  #Plot Growth models.
-  par(mfrow = c(4,5))
-  for(i in 1:N){
-    new.dat <- data.frame(seq(0 ,1 ,by = 0.01), t(output[[i]]$cov))
-    colnames(new.dat)[1] <- 'relEM'
-    pred <- predict(output[[i]]$G.mod, newdata = new.dat)
-    plot(pred ~ new.dat$relEM, bty = 'l', ylim = c(min(c(pred,pred)), max(c(pred,pred))), main = spp.name.lab[i])
-  }
-}
-
-#Get recruitment and mortality delta values and plot.----
-r.delta <- list()
-m.delta <- list()
-for(i in 1:length(spp.name.lab)){
-  new.dat <- data.frame(seq(0 ,1 ,by = 0.01), t(output[[i]]$cov))
-  colnames(new.dat)[1] <- 'relEM'
-  pred.r <- predict(output[[i]]$R.mod, newdata = new.dat)
-  pred.m <- predict(output[[i]]$M.mod, newdata = new.dat)
-  r.delta[[i]] <- pred.r[length(pred.r)] - pred.r[1]
-  m.delta[[i]] <- pred.m[length(pred.m)] - pred.m[1]
-}
-r.delta <- unlist(r.delta)
-m.delta <- unlist(m.delta)
-top.20$r.delta <- r.delta
-top.20$m.delta <- m.delta
-
-par(mfrow = c(1,2))
-N <- nrow(top.20)
-#Recruitment advantage in EM relative to AM forests by species.
-top.20 <- top.20[order(top.20$r.delta),]
-plot(top.20$r.delta, bty = 'l', ylab = 'Recruit Advantage EM forest'  , xlab = NA, pch = ifelse(top.20$MYCO_ASSO == 'AM',1, 16), xaxt = 'n', cex = 1.3)
-abline(h = 0, lwd =2, lty = 2)  
-axis(1, at=1:N, labels = F)
-text(top.20$name,cex = 0.8, x = c(1:N), y = min(top.20$r.delta)*1.15, xpd = T, srt = 90, adj = 1)
-
-
-#Mortality advantage in EM relative to AM forests by species.
-top.20 <- top.20[order(top.20$m.delta),]
-plot(top.20$m.delta, bty = 'l', ylab = 'Mortality Advantage EM forest', xlab = NA, pch = ifelse(top.20$MYCO_ASSO == 'AM',1, 16), xaxt = 'n', cex = 1.3)
-abline(h = 0, lwd =2, lty = 2)  
-axis(1, at=1:N, labels = F)
-text(top.20$name,cex = 0.8, x = c(1:N), y = min(top.20$m.delta)*1.15, xpd = T, srt = 90, adj = 1)
