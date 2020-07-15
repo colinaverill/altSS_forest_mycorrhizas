@@ -62,6 +62,7 @@ demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ec
   demographic_fits_gam_separate_plus_re_county.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_county.rds')
   demographic_fits_gam_separate_plus_re_plot.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_plot.rds')
   demographic_fits_gam_separate_plus_re_county_no.ENV.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_county_no.ENV.path')
+
 #Demographic simulation output paths.
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
      null_vs_feedback_simulation_output_RE.path <- paste0(model.dir,'null_vs_feedback_simulation_output_RE.rds')

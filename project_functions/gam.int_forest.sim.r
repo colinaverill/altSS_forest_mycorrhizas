@@ -144,6 +144,16 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #ORDER TREE TABLE BY EM STATUS.
         #So important otherwise you scramble em status later down.
         cov <- cov[order(cov$em),]
+        
+        #add county ID that will be ignored to covariate table. Necessary to get around bam.predict() bug.
+        check1 <- g.mod.am$model$county.ID
+        check2 <- g.mod.em$model$county.ID
+        check3 <- r.mod.am$model$county.ID
+        check4 <- r.mod.em$model$county.ID
+        check <- check1[check1 %in% check2]
+        check <- check [check  %in% check3]
+        check <- check [check  %in% check4]
+        cov$county.ID <- check[1]
 
         #grow your trees.
         tree.new <- c()
@@ -173,8 +183,10 @@ forest.sim <- function(g.mod.am, g.mod.em,
         colnames(tree.new) <- c('DIA.cm','em')
         
         #recruit new trees.
-        recruits.prob.am <- exp(predict(r.mod.am, newdata = plot.table[j,]))   #take exponent since model predictions are on log scale.
-        recruits.prob.em <- exp(predict(r.mod.em, newdata = plot.table[j,]))
+        r.dat <- plot.table[j,]
+        r.dat$county.ID <- check[1]
+        recruits.prob.am <- exp(predict(r.mod.am, newdata = r.dat))   #take exponent since model predictions are on log scale.
+        recruits.prob.em <- exp(predict(r.mod.em, newdata = r.dat))
         recruits.am      <- rpois(length(recruits.prob.am), recruits.prob.am)
         recruits.em      <- rpois(length(recruits.prob.em), recruits.prob.em)
         #Hard limit on stem density.
