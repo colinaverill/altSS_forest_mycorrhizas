@@ -11,7 +11,7 @@ source('project_functions/tic_toc.r')
 output.path <- null_vs_feedback_simulation_output_RE_no.ENV.path
   
 #load gam model results.----
-d <- readRDS(demographic_fits_gam_separate_plus_re_county.path)
+d <- readRDS(demographic_fits_gam_separate_plus_re_county_no.ENV.path)
 
 #Just run the function.----
 tic()

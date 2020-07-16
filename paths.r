@@ -72,6 +72,9 @@ null_vs_feedback_simulation_output_RE_uniform.path <- paste0(model.dir,'null_vs_
    initial_condition_hysteresis_simulation.path <- paste0(model.dir,'initial_condition_hysteresis_simulation.rds')
      RF_null_vs_feedback_simulation_output.path <- paste0(model.dir,'RF_null_vs_feedback_simulation_output.rds')
 
+#spatial variogram output.----
+variogram_data.path <- paste0(model.dir,'variogram_data.rds')
+     
 #bimodality analysis output.----
 bimodality_results.path <- paste0(model.dir,'bimodality_results.rds')
 
