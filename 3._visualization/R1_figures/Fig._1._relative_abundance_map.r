@@ -62,15 +62,24 @@ hist.plot.detrend <-
   ylab('Number of Forests') + 
   ylim(0, 900) +
   #add text.
-  annotation_custom(grobTree(textGrob("Detrended data to remove\nenvironmental signatures", x=0.1,  y=0.95, hjust=0,
+  annotation_custom(grobTree(textGrob("Data with environmental \nsignatures removed", x=0.1,  y=0.90, hjust=0,
                                       gp=gpar(fontface="italic"))))
 
 #setup 3-panel plot.----
 #png save line.
-png(output.path, width = 12, height = 4.5, units = 'in', res = 300)
+#png(output.path, width = 12, height = 4.5, units = 'in', res = 300)
 #Drop plots.
-ggarrange(map, hist.plot.raw, hist.plot.detrend,
-          labels = c("A", "B","C"),
-          ncol = 3, nrow = 1)
+#ggarrange(map, hist.plot.raw, hist.plot.detrend,
+#          labels = c("A", "B","C"),
+#          ncol = 3, nrow = 1)
 #end plot and save.
+#dev.off()
+
+png(output.path, width=8, height=7, units='in', res=300)
+ggarrange(map,
+          ggarrange(hist.plot.raw, hist.plot.detrend, nrow = 2, labels = c('B','C')),
+          ncol = 2,
+          widths = c(1, 0.75),
+          labels = 'A'
+          )
 dev.off()
