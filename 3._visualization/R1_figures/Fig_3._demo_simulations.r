@@ -9,7 +9,7 @@ output.path <- Fig_3.path
 
 #load demographic simulations.----
 d <- readRDS(null_vs_feedback_simulation_output_RE.path)
-y <- d$y.feedback$super.table[[41]] #100 years in.
+y <- d$y.feedback$super.table[[41]] #200 years in.
 n <- d$n.feedback$super.table[[41]]
 
 #set colors, calculate y limit.----
@@ -20,6 +20,13 @@ trans <- 0.3 #set transparency
 
 #number of breaks.
 n.breaks <- 20
+
+#generate colors.
+rbPal <- colorRampPalette(c('green','pink','purple'))
+y$col <- rbPal(n.breaks)[as.numeric(cut(y$relEM,breaks = n.breaks))]
+d.col <- y[order(y$relEM),]
+hist.cols <- unique(d.col$col)
+
 
 #y-limit.
 y$cat <- cut(y$relEM, n.breaks)
@@ -40,7 +47,7 @@ par( mar = c(4,4,1,2))
 hist(tab$relEM, breaks = n.breaks, 
      xlim = c(0,1), ylim = limy, 
      ylab = NA, xlab = NA, main = NA, 
-     bty = 'l', col = cols[1], lty = 'blank')
+     bty = 'l', col = hist.cols, lty = 'blank')
 #label.
 mtext(expression(paste("Relative Abundance Ectomycorrhizal Trees")), side = 1, line = 2.75, cex = 1)
 mtext('Number of Forests', side = 2, line = 2.5, cex = 1)
@@ -54,14 +61,13 @@ tab <- y
 hist(tab$relEM, breaks = n.breaks, 
      xlim = c(0,1), ylim = limy, 
      ylab = NA, xlab = NA, main = NA, 
-     bty = 'l', col = cols[1], lty = 'blank')
+     bty = 'l', col = hist.cols, lty = 'blank')
 #label.
 mtext(expression(paste("Relative Abundance Ectomycorrhizal Trees")), side = 1, line = 2.75, cex = 1)
 mtext('Number of Forests', side = 2, line = 2.5, cex = 1)
 msg <- 'Simulation with \ncon-mycorrhizal feedbacks'
 mtext(msg, side = 3, line = -5, adj = 0.05, cex = 0.9)
 mtext('B', side = 3, line = -3, adj = 0.05, cex = 1, font = 2)
-
 
 #end plot.----
 dev.off()
