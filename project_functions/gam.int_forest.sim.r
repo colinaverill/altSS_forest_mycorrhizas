@@ -6,6 +6,9 @@ forest.sim <- function(g.mod.am, g.mod.em,
                        step.switch = NA, switch.lev = NA, #if changing N level mid run.
                        env.cov = NA, n.cores = NA, silent = F,
                        myco.split = 'within_plot'){
+  #source other functions on which this depends.----
+  source('project_functions/predict_gam_well.r')
+  
   #Compatibility tests.----
   #Check if doParallel is installed.
   if('doParallel' %in% rownames(installed.packages()) == F){
@@ -158,11 +161,13 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #grow your trees.
         tree.new <- c()
         if(nrow(cov[cov$em == 0,]) > 0){
-          tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          #tree.new.am <- predict(g.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          tree.new.am <- predict_gam_well(g.mod.am, newdata=cov[cov$em==0,], ranef.lab='county.ID')$fit
           tree.new    <- c(tree.new, tree.new.am)
         }
         if(nrow(cov[cov$em == 1,]) > 0){
-          tree.new.em <- predict(g.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          #tree.new.em <- predict(g.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          tree.new.em <- predict_gam_well(g.mod.em, newdata=cov[cov$em==1,], ranef.lab='county.ID')$fit
           tree.new    <- c(tree.new, tree.new.em)
         }
         tree.new <- data.frame(tree.new)
@@ -170,11 +175,13 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #kill your trees.
         tree.dead <- c()
         if(nrow(cov[cov$em == 0,]) > 0){
-          tree.dead.am <- predict(m.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          #tree.dead.am <- predict(m.mod.am, newdata = cov[cov$em == 0,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          tree.dead.am <- predict_gam_well(m.mod.am, newdata=cov[cov$em==0,], ranef.lab='county.ID')$fit
           tree.dead    <- c(tree.dead, tree.dead.am)
         }
         if(nrow(cov[cov$em == 1,]) > 0){
-          tree.dead.em <- predict(m.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          #tree.dead.em <- predict(m.mod.em, newdata = cov[cov$em == 1,], exclude = c("s(county.ID)","s(PLT_CN)"), newdata.guaranteed = T)
+          tree.dead.em <- predict_gam_well(m.mod.em, newdata=cov[cov$em==1,], ranef.lab='county.ID')$fit
           tree.dead    <- c(tree.dead, tree.dead.em)
         }
         tree.dead    <- rbinom(length(tree.dead), 1, boot::inv.logit(tree.dead))   #logit, since model fit on logit scale.
@@ -185,8 +192,10 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #recruit new trees.
         r.dat <- plot.table[j,]
         r.dat$county.ID <- check[1]
-        recruits.prob.am <- exp(predict(r.mod.am, newdata = r.dat))   #take exponent since model predictions are on log scale.
-        recruits.prob.em <- exp(predict(r.mod.em, newdata = r.dat))
+        #recruits.prob.am <- exp(predict(r.mod.am, newdata = r.dat))   #take exponent since model predictions are on log scale.
+        #recruits.prob.em <- exp(predict(r.mod.em, newdata = r.dat))
+        recruits.prob.am <- exp(predict_gam_well(r.mod.am, newdata=r.dat, ranef.lab='county.ID')$fit)
+        recruits.prob.em <- exp(predict_gam_well(r.mod.em, newdata=r.dat, ranef.lab='county.ID')$fit)
         recruits.am      <- rpois(length(recruits.prob.am), recruits.prob.am)
         recruits.em      <- rpois(length(recruits.prob.em), recruits.prob.em)
         #Hard limit on stem density.
