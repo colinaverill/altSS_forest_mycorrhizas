@@ -4,6 +4,9 @@ source("paths.r")
 source("project_functions/predict_gam_well.r")
 library(mgcv)
 
+#set output path.----
+output.path <- 'figures/Supp._Fig._3._growth_responses.png'
+
 #load and workup functional group level growth.----
 N <- 300 #number of posterior draws.
 fit <- readRDS(demographic_fits_gam_separate_plus_re_county.path)
@@ -85,6 +88,9 @@ x4 <- rnorm(N,x.pos[4],jit)
 x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
+#png save line.----
+png(output.path, width = 11, height = 5, units = 'in', res = 300)
+
 #panels.----
 par(mfrow = c(1,2),
     mar = c(1.5,6.5,5,1),
@@ -129,4 +135,7 @@ mtext('Growth Advantage\namong AM Trees' , side = 3, line = 2, at = limx[1]*0.5,
 mtext('Growth Advantage\namong EM Trees', side = 3, line = 2, at = limx[2]*0.5, adj = 0.5, cex = 0.7)
 mtext('b.', side = 1, line = -1.65, adj = 0.98, cex = 0.9, font = 1)
 #legend
-legend(x = 1.5, y = 8, legend = c('AM hardwood','AM conifer', 'EM hardwood','EM confier'), pch = c(1,2,16,17) , ncol=, bg = NA, bty = 'n', cex = 0.8)
+legend(x = 0.5, y = 8, legend = c('AM hardwood','AM conifer', 'EM hardwood','EM confier'), pch = c(1,2,16,17) , ncol=, bg = NA, bty = 'n', cex = 0.8)
+
+#end plot.----
+dev.off()
