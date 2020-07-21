@@ -5,6 +5,7 @@ source('paths.r')
 #load data.----
 #load raw layer description from Crowther Lab composite.
 comp <- read.csv('required_products_utilities/composite_variable_names.csv', stringsAsFactors = F)
+doiz <- read.csv('required_products_utilities/composite_dois.csv')
 
 #load variable names actually used in the PCA of the composite.
 varnames <- read.csv(composite_variable_names.path, stringsAsFactors = F)
@@ -32,8 +33,15 @@ tab$Original.Spatial.Resolution <- NULL
 tab$Units <- NULL
 colnames(tab) <- c('Variable','Description','Source')
 
+#merge in dois.
+tab <- merge(tab, doiz[,c('Variable','doi')])
+
 #Add in Nitrogen deposition.----
-add <- c('Nitrogen Deposition','Sum of 15 year wet and dry nitrogen deposition (as ammonium and nitrate) over 2000-2014','http://nadp.slh.wisc.edu/committees/tdep/reports/TDEPreport15_Final.pdf')
-ref <- 'National Atmospheric Deposition Program. (2015). NRSP‐3. Champaign, IL: NADP Program Office, Illinois State Water Survey, University of Illinois.'
+ndep.add <- c('Nitrogen Deposition',
+              'Sum of 15 year wet and dry nitrogen deposition (as ammonium and nitrate) over 2000-2014',
+              'National Atmospheric Deposition Program. (2015). NRSP‐3. Champaign, IL: NADP Program Office, Illinois State Water Survey, University of Illinois.',
+              NA)
+test <- rbind(tab, ndep.add)
+
 #Save output.----
-write.csv(tab,'figures/Supplementary_Table_X._environmental_covariates.csv')
+write.csv(tab,'figures/Supplementary_Data_File_1._environmental_covariates.csv')
