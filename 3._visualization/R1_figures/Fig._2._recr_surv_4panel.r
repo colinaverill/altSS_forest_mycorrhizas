@@ -4,6 +4,7 @@ rm(list=ls())
 library(mgcv)
 library(data.table)
 source('paths.r')
+source('project_functions/predict_gam_well.r')
 #function to draw randomly from multivariate normal distribution.-----
 rmvn <- function(n,mu,sig) { ## MVN random deviates
   L <- mroot(sig);m <- ncol(L);
@@ -14,7 +15,8 @@ N <- 300
 
 #load, workup mortality (survival) data.----
 #Load fits and data.
-fit <- readRDS(demographic_fits_gam_separate.path)
+fit <- readRDS(demographic_fits_gam_separate_plus_re_county.path)
+#fit <- readRDS(demographic_fits_gam_separate.path)
 env <- fit$env.cov
 fit.am <- fit$y.feedback$M.mod.am
 fit.em <- fit$y.feedback$M.mod.em
@@ -22,22 +24,34 @@ fit.em <- fit$y.feedback$M.mod.em
 #Estimate impact of relEM on AM vs. EM mortality.
 am.am.dat <- c(0,0,25000,30,22,env)
 names(am.am.dat)[1:5] <- c('em','relEM','BASAL.plot','stem.density','PREVDIA.cm')
+#add county level randome ffect that will be ignored.
+check1 <- fit.am$model$county.ID
+check2 <- fit.em$model$county.ID
+check <- check1[check1 %in% check2]
+am.am.dat <- data.frame(t(am.am.dat))
+am.am.dat$county.ID <- as.factor(check[10])
+
+#make the rest of the data sets.
 am.em.dat <- am.am.dat
-am.em.dat['relEM'] <- 1
+am.em.dat$relEM <- 1
 em.em.dat <- am.em.dat
-em.em.dat['em'] <- 1
+em.em.dat$em <- 1
 em.am.dat <- em.em.dat
-em.am.dat['relEM'] <- 0
-am.am <- predict(fit.am, newdata = data.frame(t(am.am.dat)), se.fit = T)
-am.em <- predict(fit.am, newdata = data.frame(t(am.em.dat)), se.fit = T)
-em.am <- predict(fit.em, newdata = data.frame(t(em.am.dat)), se.fit = T)
-em.em <- predict(fit.em, newdata = data.frame(t(em.em.dat)), se.fit = T)
+em.am.dat$relEM <- 0
+am.am <- predict_gam_well(fit.am, newdata = am.am.dat, ranef.lab = "county.ID")
+am.em <- predict_gam_well(fit.am, newdata = am.em.dat, ranef.lab = "county.ID")
+em.am <- predict_gam_well(fit.em, newdata = em.am.dat, ranef.lab = "county.ID")
+em.em <- predict_gam_well(fit.em, newdata = em.em.dat, ranef.lab = "county.ID")
+#am.am <- predict(fit.am, newdata = am.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#am.em <- predict(fit.am, newdata = am.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#em.am <- predict(fit.em, newdata = em.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#em.em <- predict(fit.em, newdata = em.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
 y.am.am <- rnorm(N, am.am$fit, am.am$se.fit)
 y.am.em <- rnorm(N, am.em$fit, am.em$se.fit)
 y.em.am <- rnorm(N, em.am$fit, em.am$se.fit)
 y.em.em <- rnorm(N, em.em$fit, em.em$se.fit)
-y.am <- exp(c(y.am.am, y.em.am)) #undo log link to get to scale of recruitment.
-y.em <- exp(c(y.am.em, y.em.em))
+y.am <- boot::inv.logit(c(y.am.am, y.em.am)) #undo log link to get to scale of mortality.
+y.em <- boot::inv.logit(c(y.am.em, y.em.em))
 
 #convert to survival, rather than mortality.
 y.am.surv <- 1 - y.am
@@ -45,9 +59,11 @@ y.em.surv <- 1 - y.em
 
 #load, workup recruitment data.----
 #Load fits and data.
-fit <- readRDS(demographic_fits_gam_separate.path)
+fit <- readRDS(demographic_fits_gam_separate_plus_re_county.path)
 env <- fit$env.cov
 fit <- fit$y.feedback
+fit.am <- fit$R.mod.am
+fit.em <- fit$R.mod.em
 d2 <- data.table(readRDS(Product_2.subset.path))
 d1 <- readRDS(Product_1.path)
 d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
@@ -57,22 +73,72 @@ ref.dat <- c(mean(d2$PREVDIA.cm, na.rm = T),mean(d1$BASAL.AM), mean(d1$BASAL.ECM
 names(ref.dat) <- c('PREVDIA.cm','BASAL.am','BASAL.em','relEM','BASAL.plot','stem.density')
 ref.dat['relEM'] <- 0
 am.am.dat <- c(ref.dat,env)
+check1 <- fit.am$model$county.ID
+check2 <- fit.em$model$county.ID
+check <- check1[check1 %in% check2]
+am.am.dat <- data.frame(t(am.am.dat))
+am.am.dat$county.ID <- as.factor(check[1])
+
 am.em.dat <- am.am.dat
-am.em.dat['relEM'] <- 1
+am.em.dat$relEM <- 1
 em.em.dat <- am.em.dat
+em.em.dat$em <- 1
 em.am.dat <- em.em.dat
-em.am.dat['relEM'] <- 0
-am.am <- predict(fit$R.mod.am, newdata = data.frame(t(am.am.dat)), se.fit = T)
-am.em <- predict(fit$R.mod.am, newdata = data.frame(t(am.em.dat)), se.fit = T)
-em.am <- predict(fit$R.mod.em, newdata = data.frame(t(em.am.dat)), se.fit = T)
-em.em <- predict(fit$R.mod.em, newdata = data.frame(t(em.em.dat)), se.fit = T)
+em.am.dat$relEM <- 0
+am.am <- predict_gam_well(fit.am, newdata = am.am.dat, ranef.lab = "county.ID")
+am.em <- predict_gam_well(fit.am, newdata = am.em.dat, ranef.lab = "county.ID")
+em.am <- predict_gam_well(fit.em, newdata = em.am.dat, ranef.lab = "county.ID")
+em.em <- predict_gam_well(fit.em, newdata = em.em.dat, ranef.lab = "county.ID")
+#am.am <- predict(fit.am, newdata = am.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#am.em <- predict(fit.am, newdata = am.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#em.am <- predict(fit.em, newdata = em.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+#em.em <- predict(fit.em, newdata = em.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
 N <- 300
 y.am.am <- rnorm(N, am.am$fit, am.am$se.fit)
 y.am.em <- rnorm(N, am.em$fit, am.em$se.fit)
 y.em.am <- rnorm(N, em.am$fit, em.am$se.fit)
 y.em.em <- rnorm(N, em.em$fit, em.em$se.fit)
+y.am.grow <- (c(y.am.am, y.em.am))
+y.em.grow <- (c(y.am.em, y.em.em))
 y.am.recr <- exp(c(y.am.am, y.em.am)) #undo log link to get to scale of recruitment.
 y.em.recr <- exp(c(y.am.em, y.em.em))
+
+#load, workup growth data.----
+#Note- none of this is plotted.
+fit.am <- fit$G.mod.am
+fit.em <- fit$G.mod.em
+d2 <- data.table(readRDS(Product_2.subset.path))
+d1 <- readRDS(Product_1.path)
+d1 <- d1[d1$PLT_CN %in% d2$PLT_CN,]
+
+#get mean and se.
+ref.dat <- c(mean(d2$PREVDIA.cm, na.rm = T),mean(d1$BASAL.AM), mean(d1$BASAL.ECM), mean(d1$relEM), mean(d1$plot.BASAL),mean(d1$stem.density))
+names(ref.dat) <- c('PREVDIA.cm','BASAL.am','BASAL.em','relEM','BASAL.plot','stem.density')
+ref.dat['relEM'] <- 0
+am.am.dat <- c(ref.dat,env)
+check1 <- fit.am$model$county.ID
+check2 <- fit.em$model$county.ID
+check <- check1[check1 %in% check2]
+am.am.dat <- data.frame(t(am.am.dat))
+am.am.dat$county.ID <- as.factor(check[1])
+am.em.dat <- am.am.dat
+am.em.dat$relEM <- 1
+em.em.dat <- am.em.dat
+em.em.dat$em <- 1
+em.am.dat <- em.em.dat
+em.am.dat$relEM <- 0
+am.am <- predict(fit.am, newdata = am.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+am.em <- predict(fit.am, newdata = am.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+em.am <- predict(fit.em, newdata = em.am.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+em.em <- predict(fit.em, newdata = em.em.dat, se.fit = T, exclude = c("s(county.ID)"), newdata.guaranteed = T)
+N <- 300
+y.am.am <- rnorm(N, am.am$fit, am.am$se.fit)
+y.am.em <- rnorm(N, am.em$fit, am.em$se.fit)
+y.em.am <- rnorm(N, em.am$fit, em.am$se.fit)
+y.em.em <- rnorm(N, em.em$fit, em.em$se.fit)
+#subtract initial diameter to get increment.
+y.am.grow <- y.am.grow - ref.dat['PREVDIA.cm']
+y.em.grow <- y.em.grow - ref.dat['PREVDIA.cm']
 
 #load species level recruitment and mortality data.----
 d <- readRDS(demographic_fits_gam_species.path)
@@ -154,7 +220,7 @@ limx <- c(-limx, limx)
 plot(y ~ x, bty = 'n', xaxt = 'n', yaxt = 'n', cex = NA, ylab = NA, xlab = NA, xlim = limx)
 axis(3)
 abline (v = 0, lty = 2, col = 'light gray')
-arrows(x - x.sd, y, x + x.sd, y, code = 3, angle=90, length=0.0)
+arrows(x - x.sd*1.96, y, x + x.sd*1.96, y, code = 3, angle=90, length=0.0)
 points(y ~ x, pch = spp.key$pch, cex = 1.2)
 #y-axis species labels.
 text(spp.key$name,cex = 0.8, y = y, x = min(limx), adj = 1, xpd = T)

@@ -20,7 +20,16 @@ system(paste0('mkdir -p ',alt.gif.dir))
 system(paste0('mkdir -p ',all.gif.dir))
 
 #Load null vs. feedback simulation output.----
-d <- readRDS(null_vs_feedback_simulation_output.path)
+d <- readRDS(null_vs_feedback_simulation_output_RE.path)
+
+#generate histogram rainbow colors.----
+rbPal <- colorRampPalette(c('green','pink','purple'))
+y <- d$n.feedback$plot.table
+n.breaks = 20
+y$col <- rbPal(n.breaks)[as.numeric(cut(y$relEM,breaks = n.breaks))]
+d.col <- y[order(y$relEM),]
+hist.cols <- unique(d.col$col)
+
 
 #Null gif figures.----
 z <- d$n.feedback$super.table             #grab null simulation supertable.
@@ -117,7 +126,7 @@ for(i in 1:length(year)){
   x2 <- z2[[i]]$relEM
   
   #set y-limit.
-  n.breaks = 10
+  n.breaks = 20
   x1.ref   <- cut(x1, n.breaks)
   count.x1 <- table(x1.ref)
   x2.ref   <- cut(x2, n.breaks)
@@ -128,13 +137,15 @@ for(i in 1:length(year)){
   if(check < 400 & check >= 300){limy = c(0,400)}
   if(check < 300)               {limy = c(0,300)}
   
+  
+  
   #Drop plots and inner labels.
   #null histogram.
-  hist(x1, main = NULL, xlab = NA, ylab = NA, col = gif.col, lty = 'blank', 
+  hist(x1, main = NULL, xlab = NA, ylab = NA, col = hist.cols, lty = 'blank', 
        xlim = limx, ylim = limy, breaks = n.breaks)
   mtext('Simulation without \ncon-mycorrhizal feedbacks', side = 3, line = -3, adj = 0.05)
   #feedback histogram.
-  hist(x2, main = NULL, xlab = NA, ylab = NA, col = gif.col, lty = 'blank', 
+  hist(x2, main = NULL, xlab = NA, ylab = NA, col = hist.cols, lty = 'blank', 
        xlim = limx, ylim = limy, breaks = n.breaks)
   mtext('Simulation with \ncon-mycorrhizal feedbacks'   , side = 3, line = -3, adj = 0.05)
   #outer plot labels.
