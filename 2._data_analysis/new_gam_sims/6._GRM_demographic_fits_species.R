@@ -5,6 +5,7 @@ library(mgcv)
 library(doParallel)
 source('paths.r')
 source('project_functions/tic_toc.r')
+source('project_functions/predict_gam_well.r')
 
 #set output path.----
 output.path <- demographic_fits_gam_species.path
@@ -124,19 +125,24 @@ for(i in 1:length(spp.name.lab)){
   Xp.m <- predict(M.mod, newdata = newdat, type = 'lpmatrix', exclude = c("s(county.ID)"), newdata.guaranteed = T)
   Xp.r <- predict(R.mod, newdata = newdat, type = 'lpmatrix', exclude = c("s(county.ID)"), newdata.guaranteed = T)
   
+  #grab columns that are random effects.
+  g.drop <- grep('county.ID', colnames(Xp.g))
+  m.drop <- grep('county.ID', colnames(Xp.m))
+  r.drop <- grep('county.ID', colnames(Xp.r))
+  
   #Draw matrix of correlated predictors from posterior.
-  g.par <- rmvn(1000,coef(G.mod),G.mod$Vp)
-  m.par <- rmvn(1000,coef(M.mod),M.mod$Vp)
-  r.par <- rmvn(1000,coef(R.mod),R.mod$Vp)
+  g.par <- rmvn(1000,coef(G.mod)[-g.drop],G.mod$Vp[-g.drop, -g.drop])
+  m.par <- rmvn(1000,coef(M.mod)[-m.drop],M.mod$Vp[-m.drop, -m.drop])
+  r.par <- rmvn(1000,coef(R.mod)[-r.drop],R.mod$Vp[-r.drop, -r.drop])
   
   #Multiply predictors by each posterior draw of parameters.
   g.pred <- list()
   m.pred <- list()
   r.pred <- list()
   for(j in 1:1000){
-    g.pred[[j]] <- t(Xp.g %*% g.par[j,])
-    m.pred[[j]] <- t(Xp.m %*% m.par[j,])
-    r.pred[[j]] <- t(Xp.r %*% r.par[j,])
+    g.pred[[j]] <- t(Xp.g[,-g.drop] %*% g.par[j,])
+    m.pred[[j]] <- t(Xp.m[,-m.drop] %*% m.par[j,])
+    r.pred[[j]] <- t(Xp.r[,-r.drop] %*% r.par[j,])
   }
   g.pred <- do.call(rbind, g.pred)
   m.pred <- do.call(rbind, m.pred)
