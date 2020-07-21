@@ -34,7 +34,7 @@ subset_simplified_cropped <- raster::crop(subset_simplified, USA)
 
 subset_simplified_df <- tidy(subset_simplified_cropped, region = "NA_L2NAME") %>% 
   data.frame() %>% 
-  rename(NA_L2NAME = id) %>% 
+  rename(NA_L2NAME = id) %>%
   mutate(NA_L2NAME = str_to_title(NA_L2NAME))
 
 # Define world outline
@@ -43,7 +43,7 @@ USA_plotdata <- ne_countries(country = 'United States of America', scale = 10, r
 
 
 #Drop the plot.----
-png('test.png', width = 8, height = 4, units = 'in', res = 300)
+png('figures/ecoregion_map.png', width = 8, height = 4, units = 'in', res = 300)
 ggplot() +
   geom_sf(data = USA_plotdata, size = 0.2) +
   theme_minimal() +
