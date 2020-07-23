@@ -27,9 +27,16 @@ predict_gam_well <- function(fit, newdata, ranef.lab = NA, N.posterior = 1000){
   lab.drop <- grep(ranef.lab, colnames(preds))
   
   #grab parameters and parameter variance covariance matrix, excluding random effects.
-  pred.sub <- preds[,-lab.drop]
-  par.sub <- coef(fit)[-lab.drop]
-  par.cov.sub <- fit$Vp[-lab.drop, -lab.drop]
+  if(length(lab.drop != 0)){
+    pred.sub <- preds[,-lab.drop]
+    par.sub <- coef(fit)[-lab.drop]
+    par.cov.sub <- fit$Vp[-lab.drop, -lab.drop]
+  }
+  if(length(lab.drop) == 0){
+       pred.sub <- preds
+        par.sub <- coef(fit)
+    par.cov.sub <- fit$Vp
+  }
   
   #draw from parameter multivariate distribtuion to get correlated preditors.
   posterior <- rmvn(N.posterior, par.sub, par.cov.sub)

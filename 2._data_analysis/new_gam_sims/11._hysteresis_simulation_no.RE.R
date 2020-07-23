@@ -1,4 +1,4 @@
-#running simulations w/ stand replacing disturbance rate.
+#running simulations w/o random effects.
 rm(list=ls())
 source('paths.r')
 source('project_functions/gam.int_forest.sim.r')
@@ -10,10 +10,10 @@ library(data.table)
 
 
 #set output path.----
-output.path <- initial_condition_hysteresis_simulation.path
+output.path <- initial_condition_hysteresis_simulation_no.RE.path
 
 #load models and environmental covariates.----
-fits <- readRDS(demographic_fits_gam_separate_plus_re_county.path)
+fits <- readRDS(demographic_fits_gam_separate.path)
 env.cov <- fits$all.cov
 
 #register parallel environment.----

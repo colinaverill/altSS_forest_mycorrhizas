@@ -69,9 +69,12 @@ demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ec
 null_vs_feedback_simulation_output_RE_no.ENV.path <- paste0(model.dir,'null_vs_feedback_simulation_output_RE_no.ENV.rds')
 null_vs_feedback_simulation_output_RE_uniform.path <- paste0(model.dir,'null_vs_feedback_simulation_output_RE_uniform.rds')
         factorial_hysteresis_simulation.path <- paste0(model.dir,'factorial_hysteresis_simulation.rds')
-   initial_condition_hysteresis_simulation.path <- paste0(model.dir,'initial_condition_hysteresis_simulation.rds')
      RF_null_vs_feedback_simulation_output.path <- paste0(model.dir,'RF_null_vs_feedback_simulation_output.rds')
 
+#hysteresis simulations.
+initial_condition_hysteresis_simulation.path <- paste0(model.dir,'initial_condition_hysteresis_simulation.rds')
+initial_condition_hysteresis_simulation_no.RE.path <- paste0(model.dir,'initial_condition_hysteresis_simulation_no.RE.rds')
+     
 #spatial variogram output.----
 variogram_data.path <- paste0(model.dir,'variogram_data.rds')
      
