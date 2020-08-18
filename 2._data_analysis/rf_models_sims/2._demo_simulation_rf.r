@@ -5,6 +5,7 @@ library(doParallel)
 library(randomForest)
 source('project_functions/rf_forest.sim.R')
 source('project_functions/tic_toc.r')
+source('project_functions/makeitwork.r')
 
 #set output path.----
 output.path <- RF_null_vs_feedback_simulation_output.path
@@ -19,26 +20,30 @@ env.cov$BASAL.em <- NULL
 #models w/o feedbacks.
 tic()
 cat('Fitting null models...\n')
-null <- forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.models$grow.mod.em,
+null <- makeitwork(
+        forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.models$grow.mod.em,
                    r.mod.am = d$null.models$recr.mod.am, r.mod.em = d$null.models$recr.mod.em,
                    m.mod.am = d$null.models$mort.mod.am, m.mod.em = d$null.models$mort.mod.em,
                    myco.split = 'between_plot',
                    env.cov = env.cov,
                    n.cores = 28,
                    n.plots = 500, n.step = 40)
+        )
 cat('Null models fit.\n')
 toc()
 
 #models w/ feedbacks.
 tic()
 cat('Fitting feedback models...\n')
-feed <- forest.sim(g.mod.am = d$feedback.models$grow.mod.am, g.mod.em = d$feedback.models$grow.mod.em,
+feed <- makeitwork(
+        forest.sim(g.mod.am = d$feedback.models$grow.mod.am, g.mod.em = d$feedback.models$grow.mod.em,
                    r.mod.am = d$feedback.models$recr.mod.am, r.mod.em = d$feedback.models$recr.mod.em,
                    m.mod.am = d$feedback.models$mort.mod.am, m.mod.em = d$feedback.models$mort.mod.em,
                    myco.split = 'between_plot',
                    env.cov = d$env.cov,
                    n.cores = 28,
                    n.plots = 500, n.step = 40)
+        )
 cat('Feedback mdeols fit.\n')
 toc()
 
