@@ -107,8 +107,8 @@ new.dat <- colMeans(recr.dat.all)
 new.dat <- new.dat[!(names(new.dat) %in% c('relEM','recruit.em'))]
 new.dat <- data.frame(seq(0,1,by=0.01), t(new.dat))
 colnames(new.dat)[1] <- 'relEM'
-recr.pred.em <- predict(recr.mod.em, newdata = new.dat)
-recr.pred.am <- predict(recr.mod.am, newdata = new.dat)
+recr.pred.em <- predict(output$feedback.models$recr.mod.em, newdata = new.dat)
+recr.pred.am <- predict(output$feedback.models$recr.mod.am, newdata = new.dat)
 #plot
 par(mfrow = c(3,2))
 plot(recr.pred.am ~ new.dat$relEM, bty = 'l', ylim = c(0, max(c(recr.pred.am, recr.pred.em))), main = 'AM Recruitment')
@@ -120,8 +120,8 @@ new.dat <- colMeans(mort.dat.all)
 new.dat <- new.dat[!(names(new.dat) %in% c('relEM','mortality'))]
 new.dat <- data.frame(seq(0,1,by=0.01), t(new.dat))
 colnames(new.dat)[1] <- 'relEM'
-mort.pred.em <- predict(mort.mod.em, newdata = new.dat)
-mort.pred.am <- predict(mort.mod.am, newdata = new.dat)
+mort.pred.em <- predict(output$feedback.models$mort.mod.em, newdata = new.dat)
+mort.pred.am <- predict(output$feedback.models$mort.mod.am, newdata = new.dat)
 #plot
 #par(mfrow = c(1,2))
 #plot(mort.pred.am ~ new.dat$relEM, bty = 'l', ylim = c(0, max(c(mort.pred.am, mort.pred.em))), main = 'AM Mortality Probability')
@@ -135,8 +135,8 @@ new.dat <- colMeans(grow.dat.all)
 new.dat <- new.dat[!(names(new.dat) %in% c('relEM','DIA.cm'))]
 new.dat <- data.frame(seq(0,1,by=0.01), t(new.dat))
 colnames(new.dat)[1] <- 'relEM'
-grow.pred.em <- predict(grow.mod.em, newdata = new.dat)
-grow.pred.am <- predict(grow.mod.am, newdata = new.dat)
+grow.pred.em <- predict(output$feedback.models$grow.mod.em, newdata = new.dat)
+grow.pred.am <- predict(output$feedback.models$grow.mod.am, newdata = new.dat)
 #plot
 plot(grow.pred.am ~ new.dat$relEM, bty = 'l', ylim = c(min(new.dat$PREVDIA.cm), max(c(grow.pred.am, grow.pred.em))), main = 'AM Predicted Diameter')
 plot(grow.pred.em ~ new.dat$relEM, bty = 'l', ylim = c(min(new.dat$PREVDIA.cm), max(c(grow.pred.am, grow.pred.em))), main = 'EM Predicted Diameter')
