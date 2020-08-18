@@ -15,6 +15,8 @@ output.path <- rf_initial_condition_hysteresis_simulation.path
 #load models and environmental covariates.----
 fits <- readRDS(rf_demographic_fits.path)
 env.cov <- fits$env.cov
+env.cov$BASAL.am <- NULL
+env.cov$BASAL.em <- NULL
 
 #register parallel environment.----
 n.cores <- 28
@@ -69,12 +71,10 @@ for(i in 1:length(ndep.ramp.range)){
 }
 
 #Run all AM simulations.----
-#reset env.cov levels.
-env.cov <- fits$all.cov
+cat('Running all AM simulations...\n');tic()
 am.nul <- list()
 am.alt <- list()
 
-tic() #start timer.
 for(i in 1:length(ndep.ramp.range)){
   env.cov$ndep <- ndep.ramp.range[i]
   #Null model.
@@ -119,10 +119,10 @@ all.am <- list(am.nul, am.alt)
 lab <- paste0('l',ndep.ramp.range)
 #for(i in 1:length(all.em)){names(all.em[[i]]) <- lab}
 #for(i in 1:length(all.am)){names(all.am[[i]]) <- lab}
-names(all.em$em.alt) <- lab
-names(all.am$am.alt) <- lab
 names(all.em) <- c('nul','alt.GRM')
 names(all.am) <- c('nul','alt.GRM')
+names(all.em$alt.GRM) <- lab
+names(all.am$alt.GRM) <- lab
 output <- list(all.em, all.am)
 names(output) <- c('all.em','all.am')
 saveRDS(output, output.path, version = 2) #version=2 makes R 3.6 backwards compatbile with R 3.4.
