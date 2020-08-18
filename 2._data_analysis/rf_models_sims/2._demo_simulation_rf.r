@@ -11,6 +11,9 @@ output.path <- RF_null_vs_feedback_simulation_output.path
   
 #load model fits.----
 d <- readRDS(rf_demographic_fits.path)
+env.cov <- d$env.cov
+env.cov$BASAL.am <- NULL
+env.cov$BASAL.em <- NULL
 
 #Running simulations.----
 #models w/o feedbacks.
@@ -20,7 +23,7 @@ null <- forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.model
                    r.mod.am = d$null.models$recr.mod.am, r.mod.em = d$null.models$recr.mod.em,
                    m.mod.am = d$null.models$mort.mod.am, m.mod.em = d$null.models$mort.mod.em,
                    myco.split = 'between_plot',
-                   env.cov = d$env.cov,
+                   env.cov = env.cov,
                    n.cores = 28,
                    n.plots = 500, n.step = 40)
 cat('Null models fit.\n')

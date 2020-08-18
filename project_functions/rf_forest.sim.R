@@ -102,16 +102,17 @@ forest.sim <- function(g.mod.am, g.mod.em,
   #get plot table with plot level characteristics.
   plot.table <- list()
   for(i in 1:length(plot.list)){
-    sum <- plot.list[[i]]
-    density <- nrow(sum)
-    plot.basal <- sum(pi*(sum$DIA.cm/2)^2)
-    plot.basal.em <- sum(pi*((sum$em*sum$DIA.cm)/2)^2)
-    em.density <- sum(sum$em)
-    am.density <- length(sum$em) - sum(sum$em)
+    tree.tab <- plot.list[[i]]
+    density <- nrow(tree.tab)
+    plot.basal <- sum(pi*(tree.tab$DIA.cm/2)^2)
+    plot.basal.em <- sum(pi*((tree.tab$em*tree.tab$DIA.cm)/2)^2)
+    plot.basal.am <- plot.basal - plot.basal.em
+    em.density <- sum(tree.tab$em)
+    am.density <- length(tree.tab$em) - sum(tree.tab$em)
     relEM <- plot.basal.em / plot.basal
     STDAGE <- 0
-    return <- c(plot.basal, plot.basal.em, density, am.density, em.density, relEM, STDAGE)
-    names(return) <- c('BASAL.plot','BASAL.em','stem.density','am.density','em.density','relEM','STDAGE')
+    return <- c(plot.basal, plot.basal.em, plot.basal.am, density, am.density, em.density, relEM, STDAGE)
+    names(return) <- c('BASAL.plot','BASAL.em','BASAL.am','stem.density','am.density','em.density','relEM','STDAGE')
     #add the environmental covariates in (if you have any).
     if(sum(!is.na(env.cov)) > 0){
       #sample a row of the environmental covariate matrix.
@@ -204,21 +205,22 @@ forest.sim <- function(g.mod.am, g.mod.em,
     #2. Update plot table.----
     plot.table <- list()
     for(i in 1:length(plot.list)){
-      sum <- plot.list[[i]]
-      density <- nrow(sum)
-      em.density <- sum(sum$em)
-      am.density <- length(sum$em) - sum(sum$em)
-      plot.basal <- sum(pi*(sum$DIA.cm/2)^2)
-      plot.basal.em <- sum(pi*((sum$em*sum$DIA.cm)/2)^2)
+      tree.tab <- plot.list[[i]]
+      density <- nrow(tree.tab)
+      plot.basal <- sum(pi*(tree.tab$DIA.cm/2)^2)
+      plot.basal.em <- sum(pi*((tree.tab$em*tree.tab$DIA.cm)/2)^2)
+      plot.basal.am <- plot.basal - plot.basal.em
+      em.density <- sum(tree.tab$em)
+      am.density <- length(tree.tab$em) - sum(tree.tab$em)
       relEM <- plot.basal.em / plot.basal
-      if(is.nan(relEM)){relEM <- 0}
-      STDAGE <- t*5
-      return <- c(plot.basal, plot.basal.em, density, am.density, em.density, relEM, STDAGE)
-      names(return) <- c('BASAL.plot','BASAL.em','stem.density','am.density','em.density','relEM','STDAGE')
-      #add the static environmental covariates in (if you have any).
+      STDAGE <- 0
+      return <- c(plot.basal, plot.basal.em, plot.basal.am, density, am.density, em.density, relEM, STDAGE)
+      names(return) <- c('BASAL.plot','BASAL.em','BASAL.am','stem.density','am.density','em.density','relEM','STDAGE')
+      #add the environmental covariates in (if you have any).
       if(sum(!is.na(env.cov)) > 0){
-        this.env <- env.table[i,]
-        return <- c(return, this.env)
+        #sample a row of the environmental covariate matrix.
+        this.cov <- env.cov[sample(nrow(env.cov), 1),]
+        return <- c(return, this.cov)
         return <- unlist(return)
       }
       plot.table[[i]] <- return
