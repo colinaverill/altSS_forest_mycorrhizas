@@ -1,10 +1,12 @@
-parallel_rf <- function(mod_formula, data, ntree=500){
+parallel_rf <- function(mod_formula, data, ntree=500, n.cores=NA){
   #load libraries.
   library(randomForest)
   library(doParallel)
   
   #register parallel environment.
-  n.cores <- detectCores()
+  if(is.na(n.cores)){
+    n.cores <- detectCores()
+  }
   registerDoParallel(cores = n.cores)
   
   #fit model.
