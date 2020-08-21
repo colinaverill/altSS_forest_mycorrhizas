@@ -132,9 +132,10 @@ forest.sim <- function(g.mod.am, g.mod.em,
   for(t in 1:n.step){
     #1. Grow and kill your trees. Then recruit new trees.----
     #new.plot.list <- list()
+    #for(j in 1:length(plot.list)){
     new.plot.list <- 
       foreach(j = 1:length(plot.list)) %dopar% {
-        #for(j in 1:length(plot.list)){
+        
         #grab tree table for a given plot.
         cov <- plot.list[[j]]
         colnames(cov)[1] <- c('PREVDIA.cm')
@@ -162,6 +163,9 @@ forest.sim <- function(g.mod.am, g.mod.em,
         #recruit new trees.
         recruits.prob.am <- predict(r.mod.am, newdata = plot.table[j,])
         recruits.prob.em <- predict(r.mod.em, newdata = plot.table[j,])
+        #there is a very slight chance that randomforest predicts a very slightly negative value. Deal with this.
+        if(recruits.prob.am < 0){recruits.prob.am <- 0}
+        if(recruits.prob.em < 0){recruits.prob.em <- 0}
         recruits.am      <- rpois(length(recruits.prob.am), recruits.prob.am)
         recruits.em      <- rpois(length(recruits.prob.em), recruits.prob.em)
         #Hard limit on stem density.
@@ -218,8 +222,8 @@ forest.sim <- function(g.mod.am, g.mod.em,
       names(return) <- c('BASAL.plot','BASAL.em','BASAL.am','stem.density','am.density','em.density','relEM','STDAGE')
       #add the environmental covariates in (if you have any).
       if(sum(!is.na(env.cov)) > 0){
-        #sample a row of the environmental covariate matrix.
-        this.cov <- env.cov[sample(nrow(env.cov), 1),]
+        #grab your covs from env.table.
+        this.cov <- env.table[i,]
         return <- c(return, this.cov)
         return <- unlist(return)
       }
@@ -234,18 +238,6 @@ forest.sim <- function(g.mod.am, g.mod.em,
       current_time <- t*5
       talk <- paste0(current_time,' years of simulation complete.\n')
       cat(talk)
-    }
-    #4. Switch N loading if the time is right.----
-    if(!is.na(step.switch)){
-      if(t == step.switch){
-        old <- round(env.table$ndep[1],1)
-        new <- round(switch.lev, 1)
-        env.table$ndep <- switch.lev
-        msg <- paste0('N deposition switched from ',old,' to ',new,' kg N ha-1 yr-1.\n')
-        if(silent == F){
-          cat(msg)
-        }
-      }
     }
   }
   #return simulation output.----

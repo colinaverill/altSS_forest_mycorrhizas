@@ -78,20 +78,20 @@ am.alt <- list()
 for(i in 1:length(ndep.ramp.range)){
   env.cov$ndep <- ndep.ramp.range[i]
   #Null model.
-#  am.nul[[i]] <- makeitwork(
-#    forest.sim(g.mod.am = fits$null.models$grow.mod.am,
-#               g.mod.em = fits$null.models$grow.mod.em,
-#               m.mod.am = fits$null.models$mort.mod.am,
-#               m.mod.em = fits$null.models$mort.mod.em,
-#               r.mod.am = fits$null.models$recr.mod.am,
-#               r.mod.em = fits$null.models$recr.mod.em,
-#               env.cov = env.cov, 
-#               myco.split = 'all.am', silent = T,
-#               #disturb_rate = 0.0476/2,
-#               n.plots = N.PLOTS,
-#               n.cores = n.cores,
-#               n.step = N.STEPS)
-#  )
+  #  am.nul[[i]] <- makeitwork(
+  #    forest.sim(g.mod.am = fits$null.models$grow.mod.am,
+  #               g.mod.em = fits$null.models$grow.mod.em,
+  #               m.mod.am = fits$null.models$mort.mod.am,
+  #               m.mod.em = fits$null.models$mort.mod.em,
+  #               r.mod.am = fits$null.models$recr.mod.am,
+  #               r.mod.em = fits$null.models$recr.mod.em,
+  #               env.cov = env.cov, 
+  #               myco.split = 'all.am', silent = T,
+  #               #disturb_rate = 0.0476/2,
+  #               n.plots = N.PLOTS,
+  #               n.cores = n.cores,
+  #               n.step = N.STEPS)
+  #  )
   #Feedback model.
   am.alt[[i]] <- makeitwork(
     forest.sim(g.mod.am = fits$feedback.models$grow.mod.am,

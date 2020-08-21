@@ -9,7 +9,7 @@ source('project_functions/makeitwork.r')
 
 #set output path.----
 output.path <- RF_null_vs_feedback_simulation_output.path
-  
+
 #load model fits.----
 d <- readRDS(rf_demographic_fits.path)
 env.cov <- d$env.cov
@@ -21,30 +21,28 @@ env.cov$BASAL.em <- NULL
 tic()
 cat('Fitting null models...\n')
 null <- makeitwork(
-        forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.models$grow.mod.em,
-                   r.mod.am = d$null.models$recr.mod.am, r.mod.em = d$null.models$recr.mod.em,
-                   m.mod.am = d$null.models$mort.mod.am, m.mod.em = d$null.models$mort.mod.em,
-                   myco.split = 'between_plot',
-                   env.cov = env.cov,
-                   n.cores = 28,
-                   n.plots = 500, n.step = 40)
-        )
+  forest.sim(g.mod.am = d$null.models$grow.mod.am, g.mod.em = d$null.models$grow.mod.em,
+             r.mod.am = d$null.models$recr.mod.am, r.mod.em = d$null.models$recr.mod.em,
+             m.mod.am = d$null.models$mort.mod.am, m.mod.em = d$null.models$mort.mod.em,
+             myco.split = 'between_plot',
+             env.cov = env.cov,
+             n.cores = 28,
+             n.plots = 500, n.step = 40)
+)
 cat('Null models fit.\n')
 toc()
 
 #models w/ feedbacks.
 tic()
 cat('Fitting feedback models...\n')
-feed <- makeitwork(
-        forest.sim(g.mod.am = d$feedback.models$grow.mod.am, g.mod.em = d$feedback.models$grow.mod.em,
+feed <- forest.sim(g.mod.am = d$feedback.models$grow.mod.am, g.mod.em = d$feedback.models$grow.mod.em,
                    r.mod.am = d$feedback.models$recr.mod.am, r.mod.em = d$feedback.models$recr.mod.em,
                    m.mod.am = d$feedback.models$mort.mod.am, m.mod.em = d$feedback.models$mort.mod.em,
                    myco.split = 'between_plot',
-                   env.cov = d$env.cov,
-                   n.cores = 28,
+                   env.cov = env.cov,
+                   n.cores = 24,
                    n.plots = 500, n.step = 40)
-        )
-cat('Feedback mdeols fit.\n')
+cat('Feedback models fit.\n')
 toc()
 
 #wrap and save.----
