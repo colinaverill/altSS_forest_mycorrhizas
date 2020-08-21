@@ -49,12 +49,12 @@ for(i in 1:length(ndep.ramp.range)){
   )
   #Feedback model.
   em.alt[[i]] <- makeitwork(
-    forest.sim(g.mod.am = fits$n.feedback$G.mod.am,
-               g.mod.em = fits$n.feedback$G.mod.em,
-               m.mod.am = fits$n.feedback$M.mod.am,
-               m.mod.em = fits$n.feedback$M.mod.em,
-               r.mod.am = fits$n.feedback$R.mod.am, 
-               r.mod.em = fits$n.feedback$R.mod.em,
+    forest.sim(g.mod.am = fits$y.feedback$G.mod.am,
+               g.mod.em = fits$y.feedback$G.mod.em,
+               m.mod.am = fits$y.feedback$M.mod.am,
+               m.mod.em = fits$y.feedback$M.mod.em,
+               r.mod.am = fits$y.feedback$R.mod.am, 
+               r.mod.em = fits$y.feedback$R.mod.em,
                env.cov = env.cov, 
                myco.split = 'all.em', silent = T,
                #disturb_rate = 0.0476/2,
@@ -78,12 +78,12 @@ for(i in 1:length(ndep.ramp.range)){
   env.cov$ndep <- ndep.ramp.range[i]
   #Null model.
   am.nul[[i]] <- makeitwork(
-    forest.sim(g.mod.am = fits$y.feedback$G.mod.am,
-               g.mod.em = fits$y.feedback$G.mod.em,
-               m.mod.am = fits$y.feedback$M.mod.am,
-               m.mod.em = fits$y.feedback$M.mod.em,
-               r.mod.am = fits$y.feedback$R.mod.am, 
-               r.mod.em = fits$y.feedback$R.mod.em,
+    forest.sim(g.mod.am = fits$n.feedback$G.mod.am,
+               g.mod.em = fits$n.feedback$G.mod.em,
+               m.mod.am = fits$n.feedback$M.mod.am,
+               m.mod.em = fits$n.feedback$M.mod.em,
+               r.mod.am = fits$n.feedback$R.mod.am, 
+               r.mod.em = fits$n.feedback$R.mod.em,
                env.cov = env.cov, 
                myco.split = 'all.am', silent = T,
                #disturb_rate = 0.0476/2,
