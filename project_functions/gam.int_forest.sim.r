@@ -5,7 +5,7 @@ forest.sim <- function(g.mod.am, g.mod.em,
                        disturb_rate = 0.018,
                        step.switch = NA, switch.lev = NA, #if changing N level mid run.
                        env.cov = NA, n.cores = NA, silent = F,
-                       myco.split = 'within_plot'){
+                       myco.split = 'within_plot', split_frac = 0.5){
   #source other functions on which this depends.----
   source('project_functions/predict_gam_well.r')
   
@@ -64,8 +64,12 @@ forest.sim <- function(g.mod.am, g.mod.em,
     tree.2$em <- 1
     plot.list <- list()
     for(i in 1:n.plots){
-      if(i <= n.plots/2){plot.list[[i]] <- tree.1}
-      if(i >  n.plots/2){plot.list[[i]] <- tree.2}
+      if(i <= n.plots * split_frac){
+        plot.list[[i]] <- tree.1
+        }
+      if(i >  n.plots * split_frac){
+        plot.list[[i]] <- tree.2
+        }
     }
   }
   if(myco.split == 'uniform'){
