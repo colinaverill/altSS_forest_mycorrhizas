@@ -60,8 +60,8 @@ forest.sim <- function(g.mod.am, g.mod.em,
   if(myco.split == 'between_plot'){
     tree.1 <- tree
     tree.2 <- tree
-    tree.1$em <- 0
-    tree.2$em <- 1
+    tree.1$em <- 1
+    tree.2$em <- 0
     plot.list <- list()
     for(i in 1:n.plots){
       if(i <= n.plots * split_frac){
