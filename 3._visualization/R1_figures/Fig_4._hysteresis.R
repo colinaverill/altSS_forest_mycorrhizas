@@ -8,9 +8,13 @@ output.path <- Fig_4.path
 
 #generate conceptual figure data.-----
 x  <- seq(0,14,length.out=100)
-y1 <- (-1/ (1+ exp(-(x-10.0))))+1
-y2 <- (-1/ (1+ exp(-(x- 5.0))))+1
-y3 <- (-1/ (1+ exp(-(x- 7.5))))+1
+#y1 <- (-1/ (1+ exp(-(x-10.0))))+1
+#y2 <- (-1/ (1+ exp(-(x- 5.0))))+1
+#y3 <- (-1/ (1+ exp(-(x- 7.5))))+1
+y1 <- (-1.0 / (1 + exp(-(x - 7.5)))) + 1.0
+y2 <- (-1.0 / (1 + exp(-(x -10.0)))) + 1.1
+y3 <- (-0.9 / (1 + exp(-(x - 5.0)))) + 0.9
+
 
 #setup plot save destination, general figure parameters.----
 png(filename=output.path, width=10, height=4, units='in', res=300)
@@ -20,14 +24,14 @@ par(mfrow=c(1,3), oma=c(5.5,5,2,1), mar=c(0,0,0,0))
 adjust <- 1.07
 
 #Panel 1. null hypothesis.----
-limy <- max(y3) * adjust
-plot(y3~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, xaxt='n', yaxt = 'n', bty = 'l', ylim = c(0, limy))
-lines(smooth.spline(y3~x,spar=0.35), lwd=3,lty=1)
+limy <- max(c(y1,y2,y3)) * adjust
+plot(y1~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, xaxt='n', yaxt = 'n', bty = 'l', ylim = c(0, limy))
+lines(smooth.spline(y1~x,spar=0.35), lwd=3,lty=1)
 #arrows(7.5, 0.7, 9.25, 0.3, lwd = 2, length = 0.1)
 #arrows(7.5, 0.29, 5.75, 0.69, lwd = 2, length = 0.1)
 mtext('A',side=1,line=-1.5,adj=0.05, font = 2)
 #mtext('Probability EM dominated',side=2,line = 2.2)
-mtext('Frequency Ectomycorrhizal Forests',side=2,line = 3)
+mtext('Relative Abundance Ectomycorrhizal Trees',side=2,line = 3)
 text(x = -1.5, y = 1, 'high', xpd = NA, cex = 1.2)
 text(x = -1.5, y = 0.025, 'low' , xpd = NA, cex = 1.2)
 text(x =  1.5, y = -0.1, 'low' , xpd = NA, cex = 1.2)
@@ -36,9 +40,9 @@ mtext('Nitrogen Deposition',side = 1, line = 2.5 )
 mtext('H0: Environmental Filtering', side = 3, adj = 0.05, line = -1.5)
 
 #Panel 2. hysteresis hypothesis.----
-plot(y1~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, yaxt='n',xaxt='n', bty = 'l', ylim = c(0, limy))
-lines(smooth.spline(y1~x,spar=0.35), lwd=3,lty=2)
-lines(smooth.spline(y2~x,spar=0.35), lwd=3,lty=3)
+plot(y2~x,ylab=NA,xlab=NA,cex=0,cex.lab=1.2, yaxt='n',xaxt='n', bty = 'l', ylim = c(0, limy))
+lines(smooth.spline(y2~x,spar=0.35), lwd=3,lty=2)
+lines(smooth.spline(y3~x,spar=0.35), lwd=3,lty=3)
 #arrows(10.0, 0.7, 11.75, 0.3, lwd = 2, length = 0.1)
 #arrows(5.0, 0.29, 3.25, 0.69, lwd = 2, length = 0.1)
 mtext('B',side=1,line=-1.5,adj=0.05, font = 2)
@@ -55,7 +59,7 @@ legend(x= 9.5,y= 0.95,legend=c("initially EM","initially AM"),lty=c(2,3),lwd=c(3
 #load data.
 d <- readRDS(initial_condition_hysteresis_simulation.path)
 #grab results after 200 years, make these final plot tables to work with other code.
-time.step <- 41 #41 time steps = 200 years.
+time.step <- 81 #41 time steps = 200 years.
 for(i in 1:length(d$all.em$nul)){
   d$all.em$nul    [[i]]$plot.table <- d$all.em$nul    [[i]]$super.table[[time.step]]
   d$all.em$alt.GRM[[i]]$plot.table <- d$all.em$alt.GRM[[i]]$super.table[[time.step]]
@@ -119,21 +123,16 @@ for(i in 1:length(d$all.am$alt.GRM)){
 am.ramp <- data.frame(do.call(rbind, am.ramp))
 colnames(am.ramp) <- c('relEM','N.em','N.am','relEM.lo95','relEM.hi95','em.lo95','em.hi95','am.lo95','am.hi95')
 
-#FLIP AM AND EM TABLES!!!
-#This should be undone once I fix the initial conditions settings in the simulation script then rerun it.
-temp <- am.ramp
-am.ramp <- em.ramp
-em.ramp <- temp
 
 #Get EM dominated forest frequencies.
 #renaming
-#up   <- em.ramp[,c('N.em','em.lo95','em.hi95')]
-#down <- am.ramp[,c('N.em','em.lo95','em.hi95')]
-#colnames(  up) <- c('n','lo95','hi95')
-#colnames(down) <- c('n','lo95','hi95')
+up   <- em.ramp[,c('N.em','em.lo95','em.hi95')]
+down <- am.ramp[,c('N.em','em.lo95','em.hi95')]
+colnames(  up) <- c('n','lo95','hi95')
+colnames(down) <- c('n','lo95','hi95')
 #convert to frequencies.
-#  up <-   up / n.tot
-#down <- down / n.tot
+  up <-   up / n.tot
+down <- down / n.tot
 
 #Use average relative abundance EM trees instead.
   up <- em.ramp[,c('relEM','relEM.lo95','relEM.hi95')]
