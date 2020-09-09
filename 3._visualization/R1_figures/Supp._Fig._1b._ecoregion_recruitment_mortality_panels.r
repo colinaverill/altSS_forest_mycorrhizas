@@ -88,10 +88,10 @@ for(i in 1:length(output.paths)){
   abline(v = 1.25, lwd=2, lty = 3, col = 'light gray')
   #labels.
   mtext('Survival Probability', side = 2, cex = 1.0, line = 2.5)
-  legend('bottomleft',legend = c('ectomycorrhizal','arbuscular mycorrhizal'), 
-         pch = 16, col = rev(cols), bty = 'n', cex = 0.9,
-         x.intersp = .75, xpd = T, 
-         horiz = F)
+  #legend('bottomleft',legend = c('ectomycorrhizal','arbuscular mycorrhizal'), 
+  #       pch = 16, col = rev(cols), bty = 'n', cex = 0.9,
+  #       x.intersp = .75, xpd = T, 
+  #       horiz = F)
   mtext('AM Forest',side = 3, line = -1, adj = 0.125, cex = 1)
   mtext('EM Forest',side = 3, line = -1, adj = 0.9, cex = 1)
   
