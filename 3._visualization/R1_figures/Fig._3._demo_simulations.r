@@ -51,8 +51,10 @@ hist(tab$relEM, breaks = n.breaks,
 #label.
 mtext(expression(paste("Relative Abundance Ectomycorrhizal Trees")), side = 1, line = 2.75, cex = 1)
 mtext('Number of Forests', side = 2, line = 2.5, cex = 1)
-msg <- 'Simulation without \ncon-mycorrhizal feedbacks'
-mtext(msg, side = 3, line = -5, adj = 0.05, cex = 0.9)
+msg1 <- expression(paste('Simulation ',bolditalic('without')))
+msg2 <- 'con-mycorrhizal feedbacks'
+mtext(msg1, side = 3, line = -3, adj = 0.40, cex = 1.2)
+mtext(msg2, side = 3, line = -4, adj = 0.40, cex = 1.2)
 mtext('A', side = 3, line = -3, adj = 0.05, cex = 1, font = 2)
 
 #plot simulation without feedbacks.----
@@ -65,8 +67,10 @@ hist(tab$relEM, breaks = n.breaks,
 #label.
 mtext(expression(paste("Relative Abundance Ectomycorrhizal Trees")), side = 1, line = 2.75, cex = 1)
 mtext('Number of Forests', side = 2, line = 2.5, cex = 1)
-msg <- 'Simulation with \ncon-mycorrhizal feedbacks'
-mtext(msg, side = 3, line = -5, adj = 0.05, cex = 0.9)
+msg1 <- expression(paste('Simulation ',bolditalic('with')))
+msg2 <- 'con-mycorrhizal feedbacks'
+mtext(msg1, side = 3, line = -3, adj = 0.40, cex = 1.2)
+mtext(msg2, side = 3, line = -4, adj = 0.40, cex = 1.2)
 mtext('B', side = 3, line = -3, adj = 0.05, cex = 1, font = 2)
 
 #end plot.----
