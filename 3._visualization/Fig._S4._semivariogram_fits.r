@@ -3,7 +3,7 @@ rm(list=ls())
 source('paths.r')
 
 #output path.----
-output.path <- 'figures/Supplemental_Fig._2._semivariograms_fits.png'
+output.path <- 'figures/Fig._S4._semivariograms_fits.png'
 
 #load data.----
 d <- readRDS(variogram_data.path)

@@ -4,10 +4,10 @@ rm(list=ls())
 source('paths.r')
 
 #set output path.----
-output.path <- 'figures/Supp._Fig._4._hysteresis_null_vs._feedback.png'
+output.path <- 'figures/Fig._S6._hysteresis_null_vs._feedback.jpeg'
 
 #setup plot save destination, general figure parameters.----
-png(filename=output.path, width=8, height=5, units='in', res=300)
+jpeg(filename=output.path, width=8, height=5, units='in', res=300)
 
 #Set number of panels, overall margins.-----
 par(mfrow=c(1,2), oma=c(5.5,3,2,1), mar=c(0,0,0,0))

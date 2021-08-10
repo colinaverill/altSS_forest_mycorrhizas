@@ -63,6 +63,9 @@ demographic_fits_gam_ecoregion.path <- paste0(model.dir,'demographic_fits_gam_ec
   demographic_fits_gam_separate_plus_re_plot.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_plot.rds')
   demographic_fits_gam_separate_plus_re_county_no.ENV.path <- paste0(model.dir,'demographic_fits_gam_separate_plus_re_county_no.ENV.path')
 
+#response to review GAM fits.
+  atlantic_highland_RE_test.path <- paste0(model.dir,'atlantic_highland_RE_test.rds')
+
 #Demographic simulation output paths.
         null_vs_feedback_simulation_output.path <- paste0(model.dir,'null_vs_feedback_simulation_output.rds')
      null_vs_feedback_simulation_output_RE.path <- paste0(model.dir,'null_vs_feedback_simulation_output_RE.rds')
@@ -79,9 +82,18 @@ rf_initial_condition_hysteresis_simulation.path <- paste0(model.dir,'rf_initial_
 
 #spatial variogram output.----
 variogram_data.path <- paste0(model.dir,'variogram_data.rds')
+
+#recruitment power-analysis output.----
+recruit_power_analysis.path <- paste0(model.dir,'recruitment_power_analysis_data.rds')
+
+#bimodality vs. feedback strength analysis output.----
+bimod_feedback_str_analysis.path <- paste0(model.dir,'bimod_feedback_str_analysis.rds')
      
 #bimodality analysis output.----
 bimodality_results.path <- paste0(model.dir,'bimodality_results.rds')
+
+#stand age analysis output.----
+stand_age_results.path <- paste0(model.dir,'stand_age_results.rds')
 
 #Figure output paths.----
 fig.dir <- 'figures/'

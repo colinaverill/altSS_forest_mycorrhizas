@@ -5,7 +5,7 @@ source("project_functions/predict_gam_well.r")
 library(mgcv)
 
 #set output path.----
-output.path <- 'figures/Supp._Fig._3._growth_responses.png'
+output.path <- 'figures/Fig._S5._growth_responses.png'
 
 #load and workup functional group level growth.----
 N <- 300 #number of posterior draws.

@@ -183,7 +183,7 @@ x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
 #png save line.----
-png('figures/Figure_2_survival_recruitment_AM.EM_species.png', width=10, height=8, units='in', res=300)
+jpeg('figures/Fig._2_survival_recruitment_AM.EM_species.jpeg', width=10, height=8, units='in', res=300)
 #Setup panels.----
 par(mfrow = c(2,2),
     mar = c(1.5,6.5,5,1),

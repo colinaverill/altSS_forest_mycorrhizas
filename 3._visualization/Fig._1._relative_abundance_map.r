@@ -9,7 +9,6 @@ library(ggalt)
 output.path <- Fig_1.path
 
 #load data.----
-#d.map <- readRDS(Product_1.path)
 d.dat <- readRDS(bimodality_results.path)
 d.map <- d.dat$data
 d.map$relEM.detrend <- boot::inv.logit(d.map$relEM.detrend)
@@ -27,7 +26,8 @@ d.map$col <- rbPal(30)[as.numeric(cut(d.map$relEM,breaks = 30))]
 world <- map_data('usa')
 map <- ggplot() + geom_cartogram(data = world, map = world,
                                 aes(x=long, y = lat, group = group, map_id=region))
-map <- map + coord_proj("+proj=cea +lat_ts=37.5",ylim = c(25,50), xlim = c(-95,-66.5)) #crib map to eastern US.
+map <- map + coord_fixed(1.5, xlim=c(-95, -66.5)) #clip map to eastern US.
+#map <- map + coord_proj("+proj=cea +lat_ts=37.5",ylim = c(25,50), xlim = c(-95,-66.5)) #crib map to eastern US.
 map <- map + geom_point(aes(x = lon, y = lat), color = d.map$col, size = .2)              #drop points w/ particular colors.
 map <- map + theme(axis.line=element_blank(),                                          #turn off a bunch of labels.
                    axis.text.x=element_blank(),
