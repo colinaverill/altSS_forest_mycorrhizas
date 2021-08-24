@@ -95,6 +95,9 @@ bimodality_results.path <- paste0(model.dir,'bimodality_results.rds')
 #stand age analysis output.----
 stand_age_results.path <- paste0(model.dir,'stand_age_results.rds')
 
+#data for shiny visualziation.-----
+shiny_viz_data.path <- paste0(storage.dir,'shiny_viz_data.rds')
+
 #Figure output paths.----
 fig.dir <- 'figures/'
 cmd <- paste0('mkdir -p ',fig.dir)
