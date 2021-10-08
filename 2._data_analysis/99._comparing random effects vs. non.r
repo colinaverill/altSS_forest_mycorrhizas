@@ -1,4 +1,5 @@
 #compare old vs. new feedbacks.
+#this analysis was only run as a response to reviewer feedback.
 rm(list = ls())
 library(mgcv)
 source('paths.r')
