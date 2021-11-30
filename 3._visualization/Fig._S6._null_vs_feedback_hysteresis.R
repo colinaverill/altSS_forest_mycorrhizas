@@ -209,7 +209,7 @@ legend(x=2,y= 0.2,legend=c("initially EM","initially AM"),lty=1,lwd=2, col = col
 mtext('Relative Abundance Ectomycorrhizal Trees', side =2, cex=1.2, line = 2.5)
 mtext('Null Simulation', side = 3, adj = 0.05, line = -1.5)
 mtext('Nitrogen Deposition', side = 1, line = 2.5)
-mtext('C', side = 1, line = -1.5, adj = 0.05, font = 2)
+mtext('A', side = 1, line = -1.5, adj = 0.05, font = 2)
 mtext(expression(paste("kg N ha"^"-1"," yr"^"-1",sep="")), side = 1, line = 3.5,  cex = 0.7)
 
 
@@ -234,7 +234,7 @@ polygon(c(down$ndep, rev(down$ndep)),c(down$hi95, rev(down$lo95)), col=adjustcol
 #mtext('Number EM Dominated Forests', side =2, cex=1.2, line = 2.5)
 mtext('Feedback Simulation', side = 3, adj = 0.05, line = -1.5)
 mtext('Nitrogen Deposition', side = 1, line = 2.5)
-mtext('C', side = 1, line = -1.5, adj = 0.05, font = 2)
+mtext('B', side = 1, line = -1.5, adj = 0.05, font = 2)
 mtext(expression(paste("kg N ha"^"-1"," yr"^"-1",sep="")), side = 1, line = 3.5,  cex = 0.7)
 
 #end plot.----

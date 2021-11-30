@@ -29,7 +29,7 @@ pdf(output.path, width=8, height=4)
 #global plot settings.----
 par(mfrow=c(1,3))
 #EM corrleation.----
-plot(BASAL.em ~ relEM, data = d1, bty = 'l', cex = 0.3)
+plot(BASAL.em ~ relEM, data = d1, bty = 'l', cex = 0.3, ylab = 'Basal area EM trees', xlab = 'Relative Abundance EM Trees')
 fit.em <- lm(BASAL.em ~ relEM, data= d1)
 x <- data.frame(seq(0, 1, by = 0.01))
 colnames(x) <- 'relEM'
@@ -47,7 +47,7 @@ mtext(vif.lab, side = 3, line = -3.4, adj = 0.05)
 #AM plot.----
 plot(BASAL.am ~ relEM, data = d1, bty = 'l', cex = 0.3,
      ylab = 'Basal Area AM Trees',
-     xlab = 'relative abundance EM trees')
+     xlab = 'Relative Abundance EM Trees')
 fit.am <- lm(BASAL.am ~ relEM, data = d1)
 x <- data.frame(seq(0, 1, by = 0.01))
 colnames(x) <- 'relEM'

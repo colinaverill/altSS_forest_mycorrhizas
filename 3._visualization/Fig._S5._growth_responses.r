@@ -115,7 +115,7 @@ legend('topleft',legend = c('All EM trees','All AM trees'),
        horiz = F)
 mtext('AM Forest',side = 1, line = 1, adj = 0.175, cex = 1)
 mtext('EM Forest',side = 1, line = 1, adj = 0.825, cex = 1)
-mtext('a.', side = 1, line = -1.65, adj = 0.98, cex = 0.9, font = 1)
+mtext('A', side = 1, line = -1.65, adj = 0.98, cex = 0.9, font = 1)
 
 #species level growth.----
 spp.key <- spp.key[order(spp.key$g.mu),]
@@ -134,7 +134,7 @@ points(y ~ x, pch = spp.key$pch, cex = 1.2)
 text(spp.key$name,cex = 0.8, y = y, x = min(limx), adj = 1, xpd = T)
 mtext('Growth Advantage\namong AM Trees' , side = 3, line = 2, at = limx[1]*0.5, adj = 0.5, cex = 0.7)
 mtext('Growth Advantage\namong EM Trees', side = 3, line = 2, at = limx[2]*0.5, adj = 0.5, cex = 0.7)
-mtext('b.', side = 1, line = -1.65, adj = 0.98, cex = 0.9, font = 1)
+mtext('B', side = 1, line = -1.65, adj = 0.98, cex = 0.9, font = 1)
 #legend
 legend(x = 0.5, y = 8, legend = c('AM hardwood','AM conifer', 'EM hardwood','EM confier'), pch = c(1,2,16,17) , ncol=, bg = NA, bty = 'n', cex = 0.8)
 
