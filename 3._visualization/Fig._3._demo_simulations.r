@@ -37,7 +37,8 @@ limy <- c(0, max(c(count.x, count.y)))
 
 
 #png save line.----
-png(output.path, width = 11, height = 5, units = 'in', res = 300)
+#png(output.path, width = 11, height = 5, units = 'in', res = 300)
+pdf(output.path, width = 11, height = 5)
 par(mfrow = c(1,2))
 
 #plot simulation without feedbacks.----

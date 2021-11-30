@@ -66,7 +66,7 @@ hist.plot.detrend <-
                                       gp=gpar(fontface="italic"))))
 
 #setup 3-panel plot.----
-#png save line.
+#pdf save line.
 #png(output.path, width = 12, height = 4.5, units = 'in', res = 300)
 #Drop plots.
 #ggarrange(map, hist.plot.raw, hist.plot.detrend,
@@ -75,7 +75,8 @@ hist.plot.detrend <-
 #end plot and save.
 #dev.off()
 
-png(output.path, width=8, height=7, units='in', res=300)
+#png(output.path, width=8, height=7, units='in', res=300)
+pdf(output.path, width=8, height=7)
 ggarrange(map,
           ggarrange(hist.plot.raw, hist.plot.detrend, nrow = 2, labels = c('B','C')),
           ncol = 2,

@@ -17,7 +17,8 @@ y3 <- (-0.9 / (1 + exp(-(x - 5.0)))) + 0.9
 
 
 #setup plot save destination, general figure parameters.----
-png(filename=output.path, width=10, height=4, units='in', res=300)
+#png(filename=output.path, width=10, height=4, units='in', res=300)
+pdf(filename=output.path, width=10, height=4)
 #Set number of panels, overall margins.
 par(mfrow=c(1,3), oma=c(5.5,5,2,1), mar=c(0,0,0,0))
 #set vertical adjustment to add room for titles.
