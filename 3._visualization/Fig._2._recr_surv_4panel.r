@@ -5,6 +5,10 @@ library(mgcv)
 library(data.table)
 source('paths.r')
 source('project_functions/predict_gam_well.r')
+
+#set output path.----
+output.path <- Fig_2.path
+
 #function to draw randomly from multivariate normal distribution.-----
 rmvn <- function(n,mu,sig) { ## MVN random deviates
   L <- mroot(sig);m <- ncol(L);
@@ -183,8 +187,8 @@ x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
 #pdf save line.----
-#jpeg('figures/Fig._2_survival_recruitment_AM.EM_species.jpeg', width=10, height=8, units='in', res=300)
-pdf('figures/Fig._2_survival_recruitment_AM.EM_species.jpeg', width=10, height=8)
+#jpeg(output.path, width=10, height=8, units='in', res=300)
+pdf(output.path, width=10, height=8)
 #Setup panels.----
 par(mfrow = c(2,2),
     mar = c(1.5,6.5,5,1),

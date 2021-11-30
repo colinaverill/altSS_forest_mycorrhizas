@@ -18,7 +18,7 @@ y3 <- (-0.9 / (1 + exp(-(x - 5.0)))) + 0.9
 
 #setup plot save destination, general figure parameters.----
 #png(filename=output.path, width=10, height=4, units='in', res=300)
-pdf(filename=output.path, width=10, height=4)
+pdf(file=output.path, width=10, height=4)
 #Set number of panels, overall margins.
 par(mfrow=c(1,3), oma=c(5.5,5,2,1), mar=c(0,0,0,0))
 #set vertical adjustment to add room for titles.
@@ -54,7 +54,7 @@ mtext('H1: Alternative Stable States', side = 3, adj = 0.05, line = -1.5)
 
 #legend.
 legend(x= 9.5,y= 0.95,legend=c("initially EM","initially AM"),lty=c(2,3),lwd=c(3,3), 
-       box.lwd=0, bg="transparent",cex=1)
+       box.lwd=0, box.col = 'white', bg="transparent",cex=1)
 
 #hysteresis data load and workup.----
 #load data.
@@ -168,7 +168,7 @@ polygon(c(down$ndep, rev(down$ndep)),c(down$hi95, rev(down$lo95)), col=adjustcol
 
 #legend.
 legend(x=8.5,y= 0.1,legend=c("initially EM","initially AM"),lty=1,lwd=2, col = cols, 
-         box.lwd=0, bg="transparent",cex= 1)
+         box.lwd=0, box.col = 'white', bg="transparent",cex= 1)
 
 #outer labels.
 #mtext('Number EM Dominated Forests', side =2, cex=1.2, line = 2.5)

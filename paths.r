@@ -103,7 +103,7 @@ fig.dir <- 'figures/'
 cmd <- paste0('mkdir -p ',fig.dir)
 system(cmd)
       Fig_1.path <- paste0(fig.dir,'Fig._1._distribution_and_bimodality.pdf')
-      Fig_2.path <- paste0(fig.dir,'Fig._2._recruitment_mortality_feedbacks.pdf')
+      Fig_2.path <- paste0(fig.dir,'Fig._2_survival_recruitment_AM.EM_species.pdf')
       Fig_3.path <- paste0(fig.dir,'Fig._3._demographic_simulations.pdf')
       Fig_4.path <- paste0(fig.dir,'Fig._4._hysteresis.pdf')
 Supp._gif_1.path <- paste0(fig.dir,'Supp._gif_1.gif')

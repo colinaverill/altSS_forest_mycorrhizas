@@ -2,8 +2,8 @@ Alternative Stable States of the Forest Mycobiome
 ================
 
 This R project contains all code to replicate analyses and figures
-presented in Averill et al. 202x. Alternative Stable States of the
-Forest Mycobiome.
+presented in Averill et al. 2022. Alternative Stable States of the
+Forest Mycobiome. *Nature Ecology & Evolution*.
 
 The file `paths.r` is sourced at the top of all analysis and figures
 scripts. This file tracks all file paths within the project. To run this
