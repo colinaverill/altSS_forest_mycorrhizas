@@ -3,7 +3,7 @@ rm(list=ls())
 source('paths.r')
 
 #output path.----
-output.path <- 'figures/Fig._S4._semivariograms_fits.png'
+output.path <- 'figures/Extended_Data_Fig._4._semivariograms_fits.pdf'
 
 #load data.----
 d <- readRDS(variogram_data.path)
@@ -12,7 +12,8 @@ vario.model.list <- d$vario.model.list
 
 #plot results.----
 #png save line.
-png(output.path, width = 8, height = 10, units = 'in', res = 300)
+#png(output.path, width = 8, height = 10, units = 'in', res = 300)
+pdf(output.path, width = 8, height = 10)
 
 #plot
 lab <- c('Raw AM Residuals','Raw EM Residuals','Fitted AM Residuals','Fitted EM Residuals')

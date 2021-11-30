@@ -4,13 +4,14 @@ source('paths.r')
 library(boot)
 
 #set output path.----
-output.path <- 'figures/Fig._S3._bimod_feedback_strength.jpeg'
+output.path <- 'figures/Extended_Data_Fig._3._bimod_feedback_strength.pdf'
 
 #load data.----
 all.dat <- readRDS(bimod_feedback_str_analysis.path)
 
 #jpeg save line.----
-jpeg(output.path, width=8, height=5, units='in', res=300)
+#jpeg(output.path, width=8, height=5, units='in', res=300)
+pdf(output.path, width=8, height=5)
 
 #plot results.----
 par(mfrow = c(1,2))

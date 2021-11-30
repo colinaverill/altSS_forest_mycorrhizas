@@ -4,13 +4,15 @@ source('paths.r')
 library(boot)
 
 #set output path.----
-output.path <- 'figures/Fig._S1._stand_age_analysis.jpeg'
+#output.path <- 'figures/Fig._S1._stand_age_analysis.jpeg'
+output.path <- 'figures/Extended_Data_Fig._1._stand_age_analysis.pdf'
 
 #load data.----
 d <- readRDS(stand_age_results.path)
 
 #save line.----
-jpeg(output.path, width = 8, height = 5, units = 'in', res =300)
+#jpeg(output.path, width = 8, height = 5, units = 'in', res =300)
+pdf(output.path, width = 8, height = 5)
 
 #plot age relationship after detrending.----
 par(mfrow = c(1,2))

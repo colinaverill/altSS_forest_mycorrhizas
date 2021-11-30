@@ -3,14 +3,14 @@ source('paths.r')
 library(mgcv)
 
 #set output path.----
-output.path <- 'figures/Fig._S8._RE_comparison.jpeg'
+output.path <- 'figures/Extended_Data_Fig._8._RE_comparison.pdf'
 
 #load ecoregion data.
 d <- readRDS(atlantic_highland_RE_test.path)
 
 #save line.----
-jpeg(filename=output.path, width=8, height=6, units='in', res=300)
-
+#jpeg(filename=output.path, width=8, height=6, units='in', res=300)
+pdf(file=output.path, width=8, height=6)
 
 #plot two plots separately and then on top of each other.----
 par(mfrow = c(2,3))

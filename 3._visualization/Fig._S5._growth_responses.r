@@ -5,7 +5,7 @@ source("project_functions/predict_gam_well.r")
 library(mgcv)
 
 #set output path.----
-output.path <- 'figures/Fig._S5._growth_responses.png'
+output.path <- 'figures/Extended_Data_Fig._5._growth_responses.pdf'
 
 #load and workup functional group level growth.----
 N <- 300 #number of posterior draws.
@@ -89,7 +89,8 @@ x.am <- c(x1,x2)
 x.em <- c(x3,x4)
 
 #png save line.----
-png(output.path, width = 11, height = 5, units = 'in', res = 300)
+#png(output.path, width = 11, height = 5, units = 'in', res = 300)
+pdf(output.path, width = 11, height = 5)
 
 #panels.----
 par(mfrow = c(1,2),

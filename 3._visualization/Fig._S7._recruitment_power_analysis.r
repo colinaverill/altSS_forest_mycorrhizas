@@ -5,7 +5,7 @@ library(car)
 source('paths.r')
 
 #set output path.----
-output.path <- 'figures/Fig._S7._recruitment_power_analysis.jpeg'
+output.path <- 'figures/Extended_Data_Fig._7._recruitment_power_analysis.pdf'
 
 #load plot data and growth/mortality/recruitment data.----
 d1 <- data.table(readRDS(Product_1.path))
@@ -23,7 +23,8 @@ setnames(d1,'BASAL.ECM','BASAL.em')
 setnames(d1,'BASAL.AM' ,'BASAL.am')
 
 #save line.----
-jpeg(output.path, width=8, height=4, units='in', res=300)
+#jpeg(output.path, width=8, height=4, units='in', res=300)
+pdf(output.path, width=8, height=4)
 
 #global plot settings.----
 par(mfrow=c(1,3))
